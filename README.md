@@ -1,4 +1,4 @@
-# macOS Terminal Portfolio – AI Edition
+# macOS Terminal Portfolio Website – AI Edition
 
 An interactive, macOS-inspired developer portfolio designed by **Siddhanth Duggal**.
 
