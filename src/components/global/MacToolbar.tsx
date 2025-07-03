@@ -20,16 +20,26 @@ export default function MacToolbar() {
   }, []);
 
   const formatMacDate = (date: Date) => {
-    const weekday = date.toLocaleString('en-US', { weekday: 'short' });
-    const month = date.toLocaleString('en-US', { month: 'short' });
+    const weekday = date.toLocaleString('en-US', {
+      weekday: 'short',
+      timeZone: 'America/Vancouver',
+    });
+    const month = date.toLocaleString('en-US', {
+      month: 'short',
+      timeZone: 'America/Vancouver',
+    });
     const day = date.getDate();
     const hour = date.toLocaleString('en-US', {
       hour: 'numeric',
       hour12: true,
+      timeZone: 'America/Vancouver',
     });
-    const minute = date.getMinutes().toString().padStart(2, '0');
+    const minute = date.toLocaleString('en-US', {
+      minute: '2-digit',
+      timeZone: 'America/Vancouver',
+    });
     const period = date.getHours() >= 12 ? 'PM' : 'AM';
-
+  
     return `${weekday} ${month} ${day} ${hour.replace(
       /\s?[AP]M/,
       ''
@@ -66,7 +76,7 @@ export default function MacToolbar() {
       <div className='sticky top-0 z-50 hidden md:flex bg-black/20 backdrop-blur-md text-white h-6 px-4 items-center justify-between text-sm'>
         <div className='flex items-center space-x-4'>
           <FaApple size={16} />
-          <span className='font-semibold cursor-default'>John Doe</span>
+          <span className='font-semibold cursor-default'>Siddhanth Duggal</span>
           <span className='cursor-default'>File</span>
           <span className='cursor-default'>Edit</span>
           <span className='cursor-default'>View</span>
@@ -84,7 +94,7 @@ export default function MacToolbar() {
           <MdWifi size={16} />
           <IoSearchSharp size={16} />
           <span className='cursor-default'>
-            {formatMacDate(currentDateTime)}
+  {         formatMacDate(currentDateTime)} | Vancouver, BC
           </span>
         </div>
       </div>

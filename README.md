@@ -1,121 +1,65 @@
-# MacOS Terminal Portfolio - Astro Theme
+# macOS Terminal Portfolio – AI Edition
 
-![MacOS Terminal Portfolio](https://storage.googleapis.com/v-staff/theme-cover.png)
+An interactive, macOS-inspired developer portfolio designed by **Siddhanth Duggal**.
 
-An interactive macOS-inspired portfolio theme for Astro, featuring an AI-powered terminal chat, dynamic backgrounds, and a responsive dock interface.
+This isn’t your typical portfolio. Alongside a sleek macOS-style UI, this site integrates a **Retrieval-Augmented Generation (RAG)** pipeline that allows visitors to interact with an AI agent trained specifically on my resume, projects, and career highlights.
 
-## Features
+It’s not just a website - it’s **an intelligent assistant that knows me.**
 
-- OpenAI-powered terminal chat
-- Dynamic rotating wallpapers
-- Responsive macOS-style dock
-- Built-in SEO optimization
-- Automated sitemap generation
-- Customizable system prompts
-- Tailwind CSS styling
-- Mobile-friendly design
+---
 
-## Tech Stack
+### ⚡ What Makes This Unique?
 
-- [Astro](https://astro.build)
-- [React](https://reactjs.org)
-- [TypeScript](https://www.typescriptlang.org)
-- [Tailwind CSS](https://tailwindcss.com)
-- [OpenAI API](https://openai.com/api)
+✅ **RAG-Powered Terminal Chat**  
+The macOS terminal is fully interactive and leverages an advanced **LLM + vector store architecture** to provide intelligent responses. Visitors can query the AI about my work experience, projects, or skills, and receive answers grounded in actual documents I’ve authored. 
 
-## Integrations
+✅ **Multi-Stage Retrieval Pipeline**  
+The system combines semantic search using vector similarity with contextual re-ranking to ensure only the most relevant data is passed to the LLM. This allows for nuanced, high-accuracy answers even to open-ended queries.
 
-- @astrojs/react
-- @astrojs/vercel
-- @astrolib/seo
-- @astrojs/sitemap
+✅ **Dynamic macOS UI**  
+Includes an interactive terminal, rotating wallpapers, and a responsive macOS dock for quick access to my resume, LinkedIn, and GitHub. Styled with Tailwind CSS for a clean, minimal aesthetic.
 
-## Getting Started
+✅ **Agentic Query Routing**  
+The AI agent dynamically decides whether to fetch from the knowledge base, use GPT for reasoning, or execute predefined commands within the terminal environment.
 
-### Prerequisites
+---
 
-- Node.js (v18 or higher)
-- OpenAI API key
+### 🛠 Tech Stack & Architecture
 
-### Installation
+- **Astro** – Static site generator for high performance and fast page loads  
+- **React** – Renders interactive components like the terminal and dock  
+- **TypeScript** – Provides type safety and maintainability across the project  
+- **Tailwind CSS** – For utility-first responsive styling  
+- **OpenAI GPT-4** – Powers the natural language understanding and generation  
+- **Pinecone Vector DB** – Stores vector embeddings of knowledge sources for efficient semantic retrieval  
+- **LangChain** – Handles RAG orchestration, including document chunking, embedding, retrieval, and prompt engineering  
 
-1. Clone the repository:
-   `git clone https://github.com/yourusername/macos-terminal-portfolio`
+---
 
-2. Install dependencies:
-   `npm install`
+### 🧠 Technical Implementation Details
 
-3. Create a .env file in the root directory:
-   `cp .env.example .env`
+1. **Document Ingestion & Embedding**  
+   - Key documents (resume, GitHub READMEs, and articles) are processed and embedded using OpenAI’s `text-embedding-ada-002` model.
+   - Each document is split into contextually coherent chunks with metadata tags for provenance tracking.
 
-4. Add your OpenAI API key to the .env file:
-   `OPENAI_API_KEY=your_api_key_here`
+2. **Vector Storage**  
+   - Embeddings are stored in Pinecone for efficient approximate nearest neighbor search.
+   - Queries are vectorized in real time and matched against this index.
 
-5. Start the development server:
-   `npm run dev`
+3. **Retriever + Generator (RAG)**  
+   - LangChain manages retrieval and constructs prompts for GPT-4 with retrieved chunks, allowing the LLM to respond with grounded answers.
+   - Implements a **hybrid retrieval strategy**: semantic similarity + keyword matching for fallback.
 
-## Customization
+4. **Terminal UI Integration**  
+   - AI responses are piped into a macOS-styled terminal UI built with React, maintaining the illusion of a native system interface.
 
-### Personal Information
+5. **Query Routing Logic**  
+   - Custom middleware distinguishes between RAG-required queries, local terminal commands, and fallback GPT reasoning.
 
-Update the following files with your information:
+---
 
-1. `src/components/global/MacTerminal.tsx`:
+### About Me
 
-- Modify welcomeMessage and systemPrompt with your details
-- Customize placeholder messages
+I’m **Siddhanth Duggal**, a BSc student in Statistics & Biochemistry at UBC with a focus on applied AI and quant finance. This portfolio demonstrates my ability to design **end-to-end AI systems**, from vector databases to UI integration, while keeping a focus on user-centric design.
 
-2. `src/pages/index.astro`:
-
-- Update SEO metadata
-- Add your website URL
-
-3. `src/components/global/BaseHead.astro`:
-
-- Update meta tags
-- Add your favicon
-
-### Background Images
-
-Replace or add images in `src/assets/images/` directory.
-
-### Dock Icons
-
-Modify `src/components/global/DesktopDock.tsx` and MobileDock.tsx to customize your dock shortcuts.
-
-## Configuration
-
-### SEO
-
-Update SEO metadata in:
-
-- `src/pages/index.astro`
-- `src/components/global/BaseHead.astro`
-
-### Sitemap
-
-The sitemap is automatically generated using @astrojs/sitemap. Configure in astro.config.mjs.
-
-## Deployment
-
-This theme is configured for deployment on Vercel. Update astro.config.mjs if you prefer a different platform.
-
-## License
-
-MIT License - feel free to use this theme for your portfolio!
-
-## Contributing
-
-Contributions, issues, and feature requests are welcome!
-
-## Acknowledgments
-
-- Inspired by macOS interface
-- Powered by OpenAI's API
-- Built with Astro
-
-## Contact
-
-For questions or support, please open an issue on GitHub.
-
-Made with ❤️ in Austin, TX by Johnny Culbreth
+> *“If ChatGPT and macOS had a baby, it would be this portfolio.”*
