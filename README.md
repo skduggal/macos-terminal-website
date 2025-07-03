@@ -1,10 +1,8 @@
-# macOS Terminal Portfolio – AI Edition
+# macOS Terminal Portfolio – RAG Edition
 
 An interactive, macOS-inspired developer portfolio designed by **Siddhanth Duggal**.
 
 This isn’t your typical portfolio. Alongside a sleek macOS-style UI, this site integrates a **Retrieval-Augmented Generation (RAG)** pipeline that allows visitors to interact with an AI agent trained specifically on my resume, projects, and career highlights.
-
-It’s not just a website - it’s **an intelligent assistant that knows me.**
 
 ---
 
