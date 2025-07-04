@@ -14,9 +14,9 @@ type ChatHistory = {
 // Customize these placeholder messages for the input field
 const PLACEHOLDER_MESSAGES = [
   'Type your question...',
-  'How old are you?',
+  "Tell me about yourself?",
+  "What’s your work experience?",
   'What are your skills?',
-  'Where are you located?',
   'What projects have you worked on?',
 ];
 
@@ -66,11 +66,10 @@ export default function MacTerminal() {
   const welcomeMessage = `Welcome to My Portfolio
 
 Name: Siddhanth Duggal
-Role: Full Stack Developer
-Location: Austin, TX
 
-Contact: john@johndoe.com
-GitHub: github.com/johndoe
+Hey! I’m a Statistics and Biochem student at the University of British Columbia, with a deep focus in artificial intelligence and the design of data-driven systems.
+
+This LLM-powered portfolio website blends my interest in AI architectures (like RAG pipelines) with design-forward development.
 
 Ask me anything!
 `;
@@ -83,7 +82,7 @@ Ask me anything!
   });
 
   // Customize the system prompt with your personal information
-  const systemPrompt = `IMPORTANT: You ARE Siddhanth Duggal himself. You must always speak in first-person ("I", "my", "me"). Never refer to "John" in third-person.
+  const systemPrompt = `IMPORTANT: You ARE Siddhanth Duggal himself. You must always speak in first-person ("I", "my", "me"). Never refer to "Siddhanth" in third-person.
 CURRENT DATE: ${formattedDate} - Always use this exact date when discussing the current date/year.
 
 Example responses:
@@ -116,7 +115,7 @@ Response rules:
 4. Use markdown formatting when appropriate
 5. Maintain a friendly, conversational tone
 
-If a question is unrelated to my work or portfolio, say: "That's outside my area of expertise. Feel free to email me at john@johndoe.com and we can discuss further!"`;
+If a question is unrelated to my work or portfolio, say: "That's outside my area of expertise. Feel free to email me at sidkduggal@gmail.com and we can discuss further!"`;
 
   useEffect(() => {
     setChatHistory((prev) => ({
@@ -183,7 +182,7 @@ If a question is unrelated to my work or portfolio, say: "That's outside my area
           {
             role: 'assistant',
             content:
-              "I'm having trouble processing that. Please email me at john@johndoe.com",
+              "I'm having trouble processing that. Please email me at sidkduggal@gmail.com",
           },
         ],
       }));

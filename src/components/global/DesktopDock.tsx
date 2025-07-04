@@ -1,30 +1,34 @@
 import { useState } from 'react';
-import { BsGithub, BsSpotify, BsTerminal } from 'react-icons/bs';
+import { BsGithub, BsLinkedin } from 'react-icons/bs';
 import { IoIosMail } from 'react-icons/io';
-import { VscVscode } from 'react-icons/vsc';
-import { RiTerminalFill } from 'react-icons/ri';
+import { FaFilePdf, FaApple } from 'react-icons/fa'; // ✅ Resume + Apple Music
+import { RiCalendarEventLine, RiTerminalFill } from 'react-icons/ri';
 
 export default function DesktopDock() {
   const [hoveredIcon, setHoveredIcon] = useState<string | null>(null);
 
+  const handleResumeClick = () => {
+    window.open('/resume.pdf', '_blank'); // ✅ Make sure resume.pdf is in /public
+  };
+
+  const handleLinkedInClick = () => {
+    window.open('https://www.linkedin.com/in/sidkduggal/', '_blank');
+  };
+
   const handleEmailClick = () => {
-    window.location.href = 'mailto:john@johndoe.com';
+    window.location.href = 'mailto:sidkduggal@gmail.com';
   };
 
   const handleGithubClick = () => {
-    window.open('https://github.com/johndoe', '_blank');
+    window.open('https://github.com/skduggal', '_blank');
   };
 
   const handleCalendarClick = () => {
-    window.open('https://calendly.com/', '_blank');
+    window.open('https://calendar.app.google/EWnsvXq4RHBfiMg79', '_blank');
   };
 
-  const handleSpotifyClick = () => {
-    window.open('https://open.spotify.com', '_blank');
-  };
-
-  const handleVSCodeClick = () => {
-    window.location.href = 'vscode:/';
+  const handleAppleMusicClick = () => {
+    window.open('https://music.apple.com/ca/playlist/my-playlist-10/pl.u-LdbqelvIxVorK1G', '_blank');
   };
 
   const Tooltip = ({ text }: { text: string }) => (
@@ -40,17 +44,31 @@ export default function DesktopDock() {
     <div className='fixed bottom-0 left-1/2 -translate-x-1/2 hidden md:block z-50'>
       <div className='relative mb-2 p-3 bg-gradient-to-t from-gray-700 to-gray-800 backdrop-blur-2xl rounded-2xl'>
         <div className='flex items-end space-x-4'>
-          {/* VSCode */}
+
+          {/* Resume */}
           <button
-            onClick={handleVSCodeClick}
-            onMouseEnter={() => setHoveredIcon('vscode')}
+            onClick={handleResumeClick}
+            onMouseEnter={() => setHoveredIcon('resume')}
             onMouseLeave={() => setHoveredIcon(null)}
             className='relative'
           >
-            <div className='w-14 h-14 bg-white rounded-xl flex items-center justify-center shadow-lg'>
-              <VscVscode size={45} className='text-blue-500' />
+            <div className='w-14 h-14 bg-gradient-to-t from-red-600 to-red-500 rounded-xl flex items-center justify-center shadow-lg'>
+              <FaFilePdf size={38} className='text-white' />
             </div>
-            {hoveredIcon === 'vscode' && <Tooltip text='Launch VS Code' />}
+            {hoveredIcon === 'resume' && <Tooltip text= "Sid's Resume" />}
+          </button>
+
+          {/* LinkedIn */}
+          <button
+            onClick={handleLinkedInClick}
+            onMouseEnter={() => setHoveredIcon('linkedin')}
+            onMouseLeave={() => setHoveredIcon(null)}
+            className='relative'
+          >
+            <div className='w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg'>
+              <BsLinkedin size={40} className='text-white' />
+            </div>
+            {hoveredIcon === 'linkedin' && <Tooltip text='LinkedIn' />}
           </button>
 
           {/* Email */}
@@ -73,7 +91,7 @@ export default function DesktopDock() {
             onMouseLeave={() => setHoveredIcon(null)}
             className='relative'
           >
-            <div className='w-14 h-14  bg-gradient-to-t from-black to-black/60 rounded-xl flex items-center justify-center shadow-lg'>
+            <div className='w-14 h-14 bg-gradient-to-t from-black to-black/60 rounded-xl flex items-center justify-center shadow-lg'>
               <BsGithub size={45} className='text-gray-100' />
             </div>
             {hoveredIcon === 'github' && <Tooltip text='My GitHub' />}
@@ -104,17 +122,17 @@ export default function DesktopDock() {
             {hoveredIcon === 'calendar' && <Tooltip text='Book a Call' />}
           </button>
 
-          {/* Spotify */}
+          {/* Apple Music */}
           <button
-            onClick={handleSpotifyClick}
-            onMouseEnter={() => setHoveredIcon('spotify')}
+            onClick={handleAppleMusicClick}
+            onMouseEnter={() => setHoveredIcon('applemusic')}
             onMouseLeave={() => setHoveredIcon(null)}
             className='relative'
           >
-            <div className='w-14 h-14 bg-gradient-to-t from-black to-black/60 rounded-xl flex items-center justify-center shadow-lg'>
-              <BsSpotify size={45} className='text-[#1ED760]' />
+            <div className='w-14 h-14 bg-gradient-to-t from-black to-gray-800 rounded-xl flex items-center justify-center shadow-lg'>
+              <FaApple size={40} className='text-white' />
             </div>
-            {hoveredIcon === 'spotify' && <Tooltip text='My Dev Playlist' />}
+            {hoveredIcon === 'applemusic' && <Tooltip text='Apple Music' />}
           </button>
 
           {/* Divider */}
@@ -138,6 +156,7 @@ export default function DesktopDock() {
             </div>
             {hoveredIcon === 'terminal' && <Tooltip text='Terminal' />}
           </button>
+
         </div>
       </div>
     </div>
