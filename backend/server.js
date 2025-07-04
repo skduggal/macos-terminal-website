@@ -3,65 +3,128 @@ dotenv.config();
 
 import express                   from "express";
 import cors                      from "cors";
-import { Chroma }                from "langchain/vectorstores/chroma";
-import { OpenAIEmbeddings, OpenAI } from "@langchain/openai";
+import { OpenAIEmbeddings, ChatOpenAI } from "@langchain/openai";
+import { FaissStore } from "@langchain/community/vectorstores/faiss";
+import { createStuffDocumentsChain } from "langchain/chains/combine_documents";
+import { PromptTemplate } from "@langchain/core/prompts";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from 'url';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 async function start() {
-  // 1) Load your persisted Chroma store
   const embeddings = new OpenAIEmbeddings({
     openAIApiKey: process.env.OPENAI_API_KEY,
+    model: "text-embedding-3-small" // or "text-embedding-ada-002"
   });
 
-  const store = await Chroma.load(
-    "./chroma_db",
-    embeddings,
-    { collectionName: "sid-knowledge" }
-  );
-  console.log("✅ Loaded Chroma vector store from disk");
+  // Load FAISS vector store from disk
+  const store = await FaissStore.load("faiss-index", embeddings);
+  console.log("✅ Loaded FAISS vector store from disk");
 
-  // 2) Init GPT
-  const llm = new OpenAI({
+  const llm = new ChatOpenAI({
     openAIApiKey: process.env.OPENAI_API_KEY,
-    modelName:    "gpt-4",   // or whatever model tag you have access to
+    modelName: "gpt-4"
   });
 
-  // 3) API endpoint
+  // Strengthened prompt for strict context-only answers
+  const prompt = PromptTemplate.fromTemplate(`
+You are Siddhanth Duggal's portfolio file-retrieval assistant.
+
+GOAL  
+• Identify the single most relevant keyword in the user's QUESTION.  
+• Map that keyword to one of these file names:  
+    ▸ about.txt  
+    ▸ education.txt  
+    ▸ resume.txt  
+    ▸ skills.txt  
+    ▸ projects.txt  
+    ▸ personal details.txt  
+• Return the ENTIRE content of the matched file exactly as provided in CONTEXT.  
+• Do NOT add explanations, summaries, or additional text.  
+• If no keyword clearly maps to a file, reply:  
+  "No matching file found based on the question."
+
+MAPPING RULES  
+• "about", "bio", "who are you"      → about.txt  
+• "education", "study", "degree"      → education.txt  
+• "resume", "experience", "internship", company names → resume.txt  
+• "skill", "skills", "tech stack"     → skills.txt  
+• "project", "projects", specific project names → projects.txt  
+• "personal details", "contact", "email", "location" → personal details.txt
+
+FORMAT  
+• Reply with the file content verbatim.  
+• If multiple keywords map to different files, choose the first matching rule in the list above.  
+
+CONTEXT (all files concatenated below):  
+{context}
+
+QUESTION:  
+{question}
+
+ANSWER:
+
+`);
+
+  // Create the stuffDocuments chain
+  const chain = await createStuffDocumentsChain({
+    llm,
+    prompt,
+    inputKey: "question",
+    contextKey: "context"
+  });
+
+  // --- FILE ROUTER ---
+  function routeQuestionToFile(question) {
+    const q = question.toLowerCase();
+    if (/about|bio|who are you/.test(q)) return "about.txt";
+    if (/education|study|degree/.test(q)) return "education.txt";
+    if (/resume|experience|internship|company/.test(q)) return "resume.txt";
+    if (/skill|skills|tech stack/.test(q)) return "skills.txt";
+    if (/project|projects|vibe-rater|ikites|ingen|sentiment|pipeline/.test(q)) return "projects.txt";
+    if (/personal details|contact|email|location/.test(q)) return "personal.txt";
+    return null;
+  }
+
   app.post("/api/ask", async (req, res) => {
+    console.log("Received /api/ask request:", req.body);
     try {
       const { question } = req.body;
       if (!question) return res.status(400).json({ error: "No question provided" });
 
-      // Retrieve top‐K chunks
-      const retriever = store.asRetriever({ topK: 3 });
-      const docs      = await retriever.getRelevantDocuments(question);
-      const context   = docs.map(d => d.pageContent).join("\n");
+      // 1. Route question to file
+      const file = routeQuestionToFile(question);
+      if (!file) {
+        // No matching file, pass empty context
+        const answer = await chain.invoke({ question, context: "" });
+        return res.json({ answer });
+      }
 
-      // Build your prompt
-      const prompt = `
-            You are Siddhanth Duggal’s portfolio AI assistant.  
-
-            Response rules:
-            1. ALWAYS use first-person (I, me, my)
-            2. Never say "Sid" or refer to myself in third-person
-            3. Keep responses concise and professional
-            4. Use markdown formatting when appropriate
-            5. Maintain a friendly, conversational tone
-
-            If a question is unrelated to my work or portfolio, say: "That's outside my area of expertise. Feel free to email me at sidkduggal@gmail.com and we can discuss further!"
-
-            Context:
-            ${context}
-
-            Question: ${question}
-
-            Answer:
-      `.trim();
-
-      const answer = await llm.call(prompt);
+      // 2. Retrieve ALL docs for that file from FAISS
+      //    (FAISS doesn't support metadata filtering directly, so we load all docs and filter)
+      const allDocs = await store.similaritySearch(" ", 1000); // get all docs (large K)
+      const fileDocs = allDocs.filter(doc => doc.metadata && doc.metadata.source === file);
+      if (!fileDocs.length) {
+        const answer = await chain.invoke({ question, context: "" });
+        return res.json({ answer });
+      }
+      // 3. Sort docs by chunk index (from id)
+      fileDocs.sort((a, b) => {
+        const ai = parseInt((a.metadata.id || a.id || "0").split("__")[1] || 0);
+        const bi = parseInt((b.metadata.id || b.id || "0").split("__")[1] || 0);
+        return ai - bi;
+      });
+      // 4. Concatenate all chunks to reconstruct file
+      const context = fileDocs.map(doc => doc.pageContent || doc.text).join("\n");
+      // 5. Pass to LLM
+      const answer = await chain.invoke({ question, context });
       res.json({ answer });
     } catch (e) {
       console.error("❌ /api/ask error:", e);
@@ -69,8 +132,11 @@ async function start() {
     }
   });
 
-  // 4) Start server
-  app.listen(5000, () => console.log("✅ API running on http://localhost:5000"));
+  app.get('/ping', (req, res) => {
+    res.send('pong');
+  });
+
+  app.listen(5050, () => console.log("✅ API running on http://localhost:5050"));
 }
 
 start().catch(err => {
