@@ -1,4 +1,4 @@
-# macOS Terminal Portfolio – RAG Edition
+# macOS Terminal Portfolio – AI Edition
 
 An interactive, macOS-inspired developer portfolio designed by **Siddhanth Duggal**.
 
