@@ -1,0 +1,56 @@
+Siddhanth Duggal
++1 778-325-5927 | sidkduggal@gmail.com | linkedin.com/in/sidkduggal | github.com/skduggal
+
+EDUCATION
+University of British Columbia | Sep 2022 – May 2027
+Bachelor of Science in Statistics and Biochemistry (Combined Major in Science), Vancouver, BC
+Coursework: Systematic Software Design, Machine Learning, Data Structures & Algorithms, Statistical Modelling
+
+WORK EXPERIENCE
+Zamp | May 2025 – Aug 2025
+Artificial Intelligence and Go-To-Market Intern
+- Working at a Sequoia-backed agentic AI startup building autonomous workflows for finance operations at enterprises like Uber and DoorDash
+- Working on an AP automation agent that extracted invoice data and executed 2-way PO matching using document and decision agents - cutting AP processing time by 60% for enterprise users.
+- Built automation pipelines (via n8n + Slack + HubSpot) to feed LLM-powered daily sales summaries to GTM teams, reducing manual review time by 80%.
+
+iKites.AI | Jul 2024 – Dec 2024
+Applied Machine Learning Research Intern
+- Worked with Prof. Amit Sethi (IIT Bombay & University of Illinois at Chicago) on reimplementing his paper on classifying H&E stained breast tissue images into four categories using deep learning.
+- Fine-tuned the Inception-v3 CNN to achieve 93% accuracy for non-cancerous vs. malignant tissues, surpassing the previous benchmark of 83% (Araújo et al.)
+- Responsible for annotating and identifying Drusen segmentations on OCT retinal images to generate labels for a dataset.
+
+Ingenuity Gaming | May 2024 – Jul 2024
+Software Development Intern | Remote, Vancouver, BC
+- Developed and deployed web-based slot games leveraging React, JavaScript, HTML, and CSS for a highly engaging user experience.
+- Optimized user engagement and retention by implementing UI features to enhance game aesthetics, leading to a 15% increase in user satisfaction ratings.
+
+Ernst & Young (EY) | May 2023 – Aug 2023
+Transaction Diligence Intern
+- Performed financial due diligence on a U.S.-based chemical manufacturer, analyzing key financial metrics and industry trends to support M&A decisions.
+- Researched market positioning and financial performance of competitors in surfactants and ethylene derivatives, identifying valuation benchmarks and industry risks.
+
+Medanta Multi-Speciality Hospital | Apr 2022 – Aug 2022
+Machine Learning Intern | In-Person, New Delhi, IND
+- Developed a classification model with the Director of Gastroenterology (Dr. Rajesh Puri) to aid in the diagnosis of pneumonia using X-ray imaging. Leveraged a Convolutional Neural Network to achieve 89.85% accuracy.
+- Implemented geometric data augmentation techniques to minimize false positives and false negatives.
+- Researched and evaluated AI ventures with hospital staff, resulting in the identification of socially impactful projects that could potentially benefit from AI implementation.
+
+PROJECTS
+Vibe-Rater Sentiment Analysis | Python, PyTorch, Transformers, VADER, Scikit-Learn
+- Developed a sentiment analysis pipeline for Instagram comments enabling real-time sentiment classification for social media analytics
+- Implemented VADER sentiment analysis to compute individual comment scores (“vibe ratings”) from 1-10.
+- Fine-tuned a pre-trained BERT model using a dataset of ~200,000 labeled comments from Reddit and Twitter to achieve a 87% classification accuracy rate in generating an aggregate “vibe” for each comment.
+
+Emotion Detection Using Deep Learning | Python, Tensorflow, Keras, OpenCV
+- Developed a deep learning approach to detect five distinct emotions from facial expressions in images, utilizing Multi-Layer Perceptrons, Convolutional Neural Networks, and transfer learning with VGG.
+- Used Dlib's frontal face detector to plot 68 key facial landmarks, and employed Sci-kit to standardize the data.
+- Achieved 76.9% accuracy using transfer learning — surpassing human accuracy of 65 ± 5% on the fer2013 dataset.
+
+Predicting Email Spam Using Keyword Checking | R, Tidyverse, Tidymodels
+- Developed a K-NN classification model on the UCI spam email dataset
+- Achieved 84.36% accuracy with forward selection on 57 variables
+
+TECHNICAL SKILLS
+Languages: Python, R, Java, JavaScript, HTML/CSS, Dart/Flutter
+Libraries & Frameworks: PyTorch, Tensorflow, Keras, Scikit-Learn, OpenCV, React
+Tools: Git, GitHub Actions, n8n, Slack APIs, HubSpot APIs

@@ -8,13 +8,13 @@
     "embed": "node embed-knowledge.js"
   },
   "dependencies": {
-    "@langchain/community": "^0.3.0",
-    "@langchain/openai": "^0.3.0",
-    "chromadb": "^3.0.6",
+    "@langchain/community": "^0.3.48",
+    "@langchain/core": "^0.3.62",
+    "@langchain/openai": "^0.5.16",
     "cors": "^2.8.5",
-    "dotenv": "^17.0.1",
+    "dotenv": "^16.4.5",
     "express": "^5.1.0",
-    "langchain": "^0.3.29",
-    "openai": "^5.8.2"
+    "faiss-node": "^0.5.1",
+    "langchain": "^0.3.29"
   }
 }

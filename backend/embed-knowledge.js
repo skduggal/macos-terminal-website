@@ -3,17 +3,18 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import { OpenAIEmbeddings } from "@langchain/openai";
-import { Chroma }             from "langchain/vectorstores/chroma";
-import fs                     from "fs";
-import path                   from "path";
-import { fileURLToPath }      from "url";
+import { FaissStore } from "@langchain/community/vectorstores/faiss";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname  = path.dirname(__filename);
+const __dirname = path.dirname(__filename);
 
 // 1) Init OpenAI embeddings
 const embeddings = new OpenAIEmbeddings({
   openAIApiKey: process.env.OPENAI_API_KEY,
+  model: "text-embedding-3-small" // or "text-embedding-ada-002"
 });
 
 // 2) Read & chunk your data/*.txt files
@@ -30,8 +31,8 @@ for (const file of fs.readdirSync(dataDir)) {
   const chunks = text.match(/(.|[\r\n]){1,500}/g) || [];
   for (let i = 0; i < chunks.length; i++) {
     documents.push({
-      id:       `${file}__${i}`,
-      text:     chunks[i].trim(),
+      id: `${file}__${i}`,
+      text: chunks[i].trim(),
       metadata: { source: file },
     });
   }
@@ -39,19 +40,15 @@ for (const file of fs.readdirSync(dataDir)) {
 
 // 3) Embed & persist locally
 async function run() {
-  const store = await Chroma.fromTexts(
-    documents.map(d => d.text),
-    documents.map(d => d.metadata),
-    embeddings,
-    {
-      collectionName:   "sid-knowledge",
-      persistDirectory: "./chroma_db",
-    }
-  );
+  const texts = documents.map(d => d.text);
+  const metadatas = documents.map(d => d.metadata);
 
-  // write to disk
-  await store.persist();
-  console.log(`✅ Embedded ${documents.length} chunks into ./chroma_db`);
+  // Create FAISS vector store
+  const store = await FaissStore.fromTexts(texts, metadatas, embeddings);
+  // Save the FAISS index to disk
+  await store.save("faiss-index");
+
+  console.log(`✅ Embedded ${documents.length} chunks into local FAISS index`);
   process.exit(0);
 }
 
