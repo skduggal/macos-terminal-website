@@ -42,7 +42,7 @@ GOAL
 • Map that keyword to one of these file names:  
     ▸ about.txt  
     ▸ education.txt  
-    ▸ resume.txt  
+    ▸ experience.txt  
     ▸ skills.txt  
     ▸ projects.txt  
     ▸ personal details.txt  
@@ -54,7 +54,7 @@ GOAL
 MAPPING RULES  
 • "about", "bio", "who are you"      → about.txt  
 • "education", "study", "degree"      → education.txt  
-• "resume", "experience", "internship", company names → resume.txt  
+• "resume", "experience", "internship", company names → experience.txt  
 • "skill", "skills", "tech stack"     → skills.txt  
 • "project", "projects", specific project names → projects.txt  
 • "personal details", "contact", "email", "location" → personal details.txt
@@ -73,23 +73,18 @@ ANSWER:
 
 `);
 
-  // Create the stuffDocuments chain
-  const chain = await createStuffDocumentsChain({
-    llm,
-    prompt,
-    inputKey: "question",
-    contextKey: "context"
-  });
+  // Create a simple LLM chain instead of document chain
+  const chain = prompt.pipe(llm);
 
   // --- FILE ROUTER ---
   function routeQuestionToFile(question) {
     const q = question.toLowerCase();
     if (/about|bio|who are you/.test(q)) return "about.txt";
     if (/education|study|degree/.test(q)) return "education.txt";
-    if (/resume|experience|internship|company/.test(q)) return "resume.txt";
+    if (/resume|experience|internship|company/.test(q)) return "experience.txt";
     if (/skill|skills|tech stack/.test(q)) return "skills.txt";
     if (/project|projects|vibe-rater|ikites|ingen|sentiment|pipeline/.test(q)) return "projects.txt";
-    if (/personal details|contact|email|location/.test(q)) return "personal.txt";
+    if (/personal details|contact|email|location/.test(q)) return "personal details.txt";
     return null;
   }
 
@@ -104,7 +99,7 @@ ANSWER:
       if (!file) {
         // No matching file, pass empty context
         const answer = await chain.invoke({ question, context: "" });
-        return res.json({ answer });
+        return res.json({ answer: answer.content });
       }
 
       // 2. Retrieve ALL docs for that file from FAISS
@@ -113,7 +108,7 @@ ANSWER:
       const fileDocs = allDocs.filter(doc => doc.metadata && doc.metadata.source === file);
       if (!fileDocs.length) {
         const answer = await chain.invoke({ question, context: "" });
-        return res.json({ answer });
+        return res.json({ answer: answer.content });
       }
       // 3. Sort docs by chunk index (from id)
       fileDocs.sort((a, b) => {
@@ -124,8 +119,11 @@ ANSWER:
       // 4. Concatenate all chunks to reconstruct file
       const context = fileDocs.map(doc => doc.pageContent || doc.text).join("\n");
       // 5. Pass to LLM
-      const answer = await chain.invoke({ question, context });
-      res.json({ answer });
+      const answer = await chain.invoke({ 
+        question, 
+        context: fileDocs.map(doc => doc.pageContent || doc.text).join("\n")
+      });
+      res.json({ answer: answer.content });
     } catch (e) {
       console.error("❌ /api/ask error:", e);
       res.status(500).json({ error: "Server error" });
