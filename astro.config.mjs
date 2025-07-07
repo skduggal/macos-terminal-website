@@ -15,6 +15,11 @@ export default defineConfig({
   // Vite configuration
   vite: {
     plugins: [tailwindcss()],
+    server: {
+      proxy: {
+        '/api': 'http://localhost:5050',
+      },
+    },
   },
 
   // Required integrations
