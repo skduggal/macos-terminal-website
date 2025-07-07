@@ -2,14 +2,14 @@ I'm Siddhanth Duggal, a Statistics and Biochemistry student at the University of
 
 I have a deep focus on AI because of its transformative potential to solve complex problems across industries and improve human decision-making through intelligent systems.
 
-I'm equally passionate about quantitative finance, drawn to the intersection of mathematics, statistics, and financial markets. Having started investing in high school, I enjoy staying current with market trends through The Wall Street Journal and exploring how quantitative methods drive trading strategies and risk management.
+I'm equally passionate about quantitative finance, as I'm drawn to the intersection of mathematics, statistics, and financial markets. 
 
-At my core, I'm a problem solver who thrives on breaking down complex challenges into manageable components. Whether I'm debugging code, analyzing market patterns, or optimizing data pipelines, I approach each problem with systematic thinking and creative solutions. This mindset extends beyond technical work—I believe every challenge and failure is an opportunity to learn something new.
+At my core, I'm a problem solver who works by breaking down complex challenges into manageable components. I believe every challenge and failure is an opportunity to learn something new.
 
-Curious, analytical, and impact-driven, my work bridges technical research and practical application. I have interned across various domains, gaining perspective on how data can drive meaningful innovation. Alongside my technical work, I have led and collaborated on team-based projects across academic and corporate environments.
+Curious, analytical, and impact-driven, my work bridges technical research and practical application. I have interned across various domains, gaining perspective on how data can drive meaningful innovation. 
 
 I'm an avid reader with particular interests in psychology, philosophy, and strategic thinking. Some of my favorite books include 'Influence: The Psychology of Persuasion' by Robert Cialdini, 'Meditations' by Marcus Aurelius, 'The Prince' by Niccolò Machiavelli, and 'The Almanack of Naval Ravikant' by Eric Jorgenson.
 
 I'm also passionate about poker, which has taught me invaluable lessons about probability, risk management, and reading human behavior. The game perfectly combines mathematical precision with psychological insight, requiring constant adaptation and strategic thinking. Poker has sharpened my ability to make decisions under uncertainty and manage risk—skills that translate directly to both quantitative finance and data science.
 
-Outside of code and data, I'm passionate about fitness as an amateur bodybuilder and powerlifter, with personal bests of 265 lbs bench press, 405 lbs squat, and 425 lbs deadlift. I draw inspiration from legends like Ronnie Coleman, Tom Platz, and Chris Bumstead. When I'm not in the gym, you'll find me playing football (lifelong FC Barcelona fan) or perfecting the art of brewing black coffee."
+Outside of code and data, I'm passionate about fitness as an amateur bodybuilder and powerlifter, with personal bests of 265 lbs bench press, 405 lbs squat, and 425 lbs deadlift. I draw inspiration from legends like Ronnie Coleman, Tom Platz, and Chris Bumstead.
