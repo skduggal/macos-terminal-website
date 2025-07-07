@@ -205,27 +205,14 @@ Before final response:
         }
       }
 
-      // 6. Strict prompt for segmented answers
-      const hybridPrompt = PromptTemplate.fromTemplate(`
-You are a portfolio assistant. Use only the information in the CONTEXT below to answer the QUESTION. 
-For each part of your answer, clearly indicate which file it comes from (e.g., "From education.txt: ...").
-If the answer is not present, reply: "I don't know."
-
-CONTEXT:
-{context}
-
-QUESTION:
-{question}
-
-ANSWER:
-`);
-      const hybridChain = hybridPrompt.pipe(new ChatOpenAI({
+      // Use the single prompt for all LLM calls
+      const chain = prompt.pipe(new ChatOpenAI({
         openAIApiKey: process.env.OPENAI_API_KEY,
         modelName: "gpt-4",
         temperature: 0
       }));
 
-      const answer = await hybridChain.invoke({ question, context });
+      const answer = await chain.invoke({ question, context });
       res.json({ answer: answer.content });
     } catch (e) {
       console.error("❌ /api/ask error:", e);
