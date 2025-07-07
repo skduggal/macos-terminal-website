@@ -28,12 +28,24 @@ const documents = [];
 for (const file of fs.readdirSync(dataDir)) {
   if (!file.endsWith(".txt")) continue;
   const text = fs.readFileSync(path.join(dataDir, file), "utf8");
-  const chunks = text.match(/(.|[\r\n]){1,500}/g) || [];
-  for (let i = 0; i < chunks.length; i++) {
+  // Split by double newlines (section/paragraph)
+  const sections = text.split(/\n{2,}/).map(s => s.trim()).filter(Boolean);
+  for (let i = 0; i < sections.length; i++) {
+    const sectionText = sections[i];
+    // Use first non-empty line as section title (if looks like a header)
+    let sectionTitle = sectionText.split("\n").find(line => line.trim().length > 0) || "Section";
+    // Heuristic: if sectionTitle is all-caps or ends with ':' or '|', treat as title, else fallback to file name
+    if (!/^([A-Z\s\-\|:]+|.+:|.+\|)$/.test(sectionTitle.trim())) {
+      sectionTitle = file;
+    }
     documents.push({
       id: `${file}__${i}`,
-      text: chunks[i].trim(),
-      metadata: { source: file },
+      text: sectionText,
+      metadata: {
+        source: file,
+        section: sectionTitle.trim(),
+        chunkIndex: i
+      },
     });
   }
 }
