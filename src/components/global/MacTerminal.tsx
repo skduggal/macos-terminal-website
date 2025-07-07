@@ -15,7 +15,7 @@ type ChatHistory = {
 const PLACEHOLDER_MESSAGES = [
   'Type your question...',
   "Tell me about yourself?",
-  "What’s your work experience?",
+  "What's your work experience?",
   'What are your skills?',
   'What projects have you worked on?',
 ];
@@ -67,7 +67,7 @@ export default function MacTerminal() {
 
 Name: Siddhanth Duggal
 
-Hey! I’m a Statistics and Biochem student at the University of British Columbia, with a deep focus in artificial intelligence and the design of data-driven systems.
+Hey! I'm a Statistics and Biochem student at the University of British Columbia, with a deep focus in artificial intelligence and the design of data-driven systems.
 
 This LLM-powered portfolio website blends my interest in AI architectures (like RAG pipelines) with design-forward development.
 
@@ -149,18 +149,13 @@ If a question is unrelated to my work or portfolio, say: "That's outside my area
     setIsTyping(true);
 
     try {
-      const response = await fetch('/api/chat', {
+      // Send to RAG backend
+      const response = await fetch('/api/ask', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          messages: [
-            { role: 'system', content: systemPrompt },
-            ...chatHistory.messages,
-            { role: 'user', content: userInput },
-          ],
-        }),
+        body: JSON.stringify({ question: userInput }),
       });
 
       if (!response.ok) throw new Error('Failed to get response');
@@ -171,7 +166,7 @@ If a question is unrelated to my work or portfolio, say: "That's outside my area
         ...prev,
         messages: [
           ...prev.messages,
-          { role: 'assistant', content: data.message },
+          { role: 'assistant', content: data.answer },
         ],
       }));
     } catch (error) {
