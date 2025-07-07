@@ -1,0 +1,9 @@
+Core Languages
+Python (Expert) · R (Advanced) · JavaScript/TypeScript (Proficient) · HTML/CSS (Proficient) · Java (Familiar) · LaTeX (Familiar)
+
+ML & Data Engineering Stack
+PyTorch (vision & NLP) · TensorFlow/Keras · Scikit-Learn · LangChain (RAG) · LangFuse · OpenCV · Prompt engineering
+
+Software & DevOps Tooling
+Node.js + Express · React & Astro (interactive UIs) · n8n / Windmill (workflow automation) · Git & GitHub Actions
+
