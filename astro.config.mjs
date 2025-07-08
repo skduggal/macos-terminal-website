@@ -23,7 +23,9 @@ export default defineConfig({
     build: {
       rollupOptions: {
         external: [
-          '@langchain/community/vectorstores/faiss'
+          '@langchain/community/vectorstores/faiss',
+          '@langchain/openai',
+          '@langchain/core/prompts'
         ]
       }
     }
