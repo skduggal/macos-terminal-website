@@ -25,16 +25,15 @@ const backgrounds = await Promise.all([
 
 <!-- SEO Configuration - customize these values -->
 <AstroSeo
-  title={Astro.props.title || 'Siddhanth Duggal - Statistics & Biochemistry Student'}
-  description={Astro.props.description ||
-    'Statistics and Biochemistry student at UBC with a focus on AI and data-driven systems'}
+  title={Astro.props.title || 'Siddhanth Duggal - Statistics + Biochem @ UBC'}
+  description={Astro.props.description || 'Problem-solving through data-driven technological innovation, with a deep focus on AI.'}
   canonical={Astro.props.canonical || 'https://sidkd.com'}
   openGraph={{
     url: Astro.props.openGraph?.url || 'https://sidkd.com',
-    title: Astro.props.openGraph?.title || 'Siddhanth Duggal - Statistics & Biochemistry Student',
+    title: Astro.props.openGraph?.title || 'Siddhanth Duggal - Statistics + Biochem @ UBC',
     description:
       Astro.props.openGraph?.description ||
-      'Statistics and Biochemistry student at UBC with a focus on AI and data-driven systems',
+      'Problem-solving through data-driven technological innovation, with a deep focus on AI.',
     images: [
       {
         url: '',
