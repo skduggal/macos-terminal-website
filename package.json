@@ -16,6 +16,7 @@
     "@langchain/community": "^0.3.48",
     "@langchain/core": "^0.3.62",
     "@langchain/openai": "^0.5.18",
+    "@qdrant/js-client-rest": "^1.14.1",
     "@tailwindcss/vite": "^4.0.3",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",

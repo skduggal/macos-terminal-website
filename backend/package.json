@@ -8,9 +8,12 @@
     "embed": "node embed-knowledge.js"
   },
   "dependencies": {
+    "@chroma-core/default-embed": "^0.1.8",
     "@langchain/community": "^0.3.48",
     "@langchain/core": "^0.3.62",
     "@langchain/openai": "^0.5.16",
+    "@qdrant/js-client-rest": "^1.14.1",
+    "chromadb": "^3.0.6",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^5.1.0",
