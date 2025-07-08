@@ -4,6 +4,9 @@ import MacTerminal from '../components/global/MacTerminal';
 import MobileDock from '../components/global/MobileDock';
 import DesktopDock from '../components/global/DesktopDock';
 
+// This component is rendered with Astro's client:only directive, so all code here is guaranteed to run only in the browser.
+// It is safe to use browser APIs like localStorage, window, etc.
+
 interface AppLayoutProps {
   initialBg: string;
   backgroundMap: Record<string, string>;
