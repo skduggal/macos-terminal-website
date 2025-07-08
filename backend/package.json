@@ -8,6 +8,7 @@
     "embed": "node embed-knowledge.js"
   },
   "dependencies": {
+    "@astrojs/tailwind": "^6.0.2",
     "@chroma-core/default-embed": "^0.1.8",
     "@langchain/community": "^0.3.48",
     "@langchain/core": "^0.3.62",
