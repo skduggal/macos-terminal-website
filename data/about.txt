@@ -6,8 +6,6 @@ I'm equally passionate about quantitative finance, as I'm drawn to the intersect
 
 At my core, I'm a problem solver who works by breaking down complex challenges into manageable components. I believe every challenge and failure is an opportunity to learn something new.
 
-Curious, analytical, and impact-driven, my work bridges technical research and practical application. I have interned across various domains, gaining perspective on how data can drive meaningful innovation. 
-
 I'm an avid reader with particular interests in psychology, philosophy, and strategic thinking. Some of my favorite books include 'Influence: The Psychology of Persuasion' by Robert Cialdini, 'Meditations' by Marcus Aurelius, 'The Prince' by Niccolò Machiavelli, and 'The Almanack of Naval Ravikant' by Eric Jorgenson.
 
 I'm also passionate about poker, which has taught me invaluable lessons about probability, risk management, and reading human behavior. The game perfectly combines mathematical precision with psychological insight, requiring constant adaptation and strategic thinking. Poker has sharpened my ability to make decisions under uncertainty and manage risk—skills that translate directly to both quantitative finance and data science.
