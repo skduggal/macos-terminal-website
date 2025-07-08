@@ -162,16 +162,16 @@ Ask me anything!
         </span>
       </div>
       <div className='p-4 text-gray-200 font-mono text-xs h-[calc(400px-1.5rem)] flex flex-col'>
-        <div className='flex-1 overflow-y-auto'>
+        <div className='flex-1 overflow-y-auto overflow-x-hidden'>
           {chatHistory.messages.map((msg, index) => (
             <div key={index} className='mb-2'>
               {msg.role === 'user' ? (
                 <div className='flex items-start space-x-2'>
-                  <span className='text-green-400'>{'>'}</span>
-                  <pre className='whitespace-pre-wrap'>{msg.content}</pre>
+                  <span className='text-green-400 flex-shrink-0'>{'>'}</span>
+                  <pre className='whitespace-pre-wrap break-words overflow-hidden flex-1'>{msg.content}</pre>
                 </div>
               ) : (
-                <pre className='whitespace-pre-wrap'>{msg.content}</pre>
+                <pre className='whitespace-pre-wrap break-words overflow-hidden'>{msg.content}</pre>
               )}
             </div>
           ))}
