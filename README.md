@@ -2,7 +2,7 @@
 
 An interactive, macOS-inspired developer portfolio designed by **Siddhanth Duggal**.
 
-This isn't your typical portfolio. Alongside a sleek macOS-style UI, this site integrates a **Retrieval-Augmented Generation (RAG)** pipeline that allows visitors to interact with an AI agent trained specifically on my resume, projects, and career highlights.
+Alongside a sleek macOS-style UI, this site integrates a **Retrieval-Augmented Generation (RAG)** pipeline that allows visitors to interact with an AI agent trained specifically on my resume, projects, and career highlights.
 
 ---
 
@@ -55,18 +55,6 @@ The AI agent dynamically decides whether to fetch from the knowledge base, use G
 
 5. **Terminal UI Integration**  
    - AI responses are piped into a macOS-styled terminal UI built with React, maintaining the illusion of a native system interface.
-
----
-
-### 🌐 Deployment & Environment Variables
-
-To deploy on Vercel or locally, set the following environment variables:
-
-- `OPENAI_API_KEY` – Your OpenAI API key
-- `QDRANT_URL` – Your Qdrant Cloud cluster URL
-- `QDRANT_API_KEY` – Your Qdrant Cloud API key
-
-You can add these to a `.env` file in the project root or set them in your Vercel dashboard.
 
 ---
 
