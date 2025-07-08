@@ -1,27 +1,32 @@
 PROJECTS
 
-Vibe-Rater Sentiment Analysis | Python, PyTorch, Transformers, VADER, Scikit-Learn
+Vibe-Rater Sentiment Analysis 
 - Developed a sentiment analysis pipeline for Instagram comments enabling real-time sentiment classification for social media analytics
 - Implemented VADER sentiment analysis to compute individual comment scores (“vibe ratings”) from 1-10.
 - Fine-tuned a pre-trained BERT model using a dataset of ~200,000 labeled comments from Reddit and Twitter to achieve a 87% classification accuracy rate in generating an aggregate “vibe” for each comment.
+- Tech Stack: Python, PyTorch, Transformers, VADER, Scikit-Learn
 
-Emotion Detection Using Deep Learning | Python, Tensorflow, Keras, OpenCV
+Emotion Detection Using Deep Learning 
 - Developed a deep learning approach to detect five distinct emotions from facial expressions in images, utilizing Multi-Layer Perceptrons, Convolutional Neural Networks, and transfer learning with VGG.
 - Used Dlib's frontal face detector to plot 68 key facial landmarks, and employed Sci-kit to standardize the data.
 - Achieved 76.9% accuracy using transfer learning — surpassing human accuracy of 65 ± 5% on the fer2013 dataset.
+- Tech Stack: Python, Tensorflow, Keras, OpenCV
 
 Email Spam Filtering Using K-NN
 - Developed and implemented a K-Nearest Neighbors (K-NN) classification model on the UCI Machine Learning Repository's spam email database.
 - Cleaned and wrangled information derived from 4601 emails and utilised forward selection to choose the most accurate predictor variables from the 57 continuous real variables present.
 - Trained and tested the model to achieve an accuracy of 84.36%.
+- Tech Stack: R
 
 macOS Terminal Portfolio
 - Integrated OpenAI GPT API to power an AI terminal chat experience capable of answering questions about education, work experience, and technical skills.
 - Implemented Retrieval-Augmented Generation (RAG) architecture using Pinecone and LangChain to ground AI responses in my personal resume and project data.
 - Developed the front-end using Astro, React, and TailwindCSS, achieving a modern and responsive design optimized for desktop and mobile devices.
+- Tech Stack: OpenAI GPT API, Pinecone, LangChain, Astro, React, TailwindCSS
 
 Workday2iCal
 - Developed a Python program to convert Workday schedule data exported from Excel into iCal format, enabling seamless integration with personal calendar applications.
 - Leveraged pandas for efficient data wrangling of Excel (.xlsx) files containing course schedules, ensuring robust handling of missing data entries.
 - Used the icalendar library to dynamically generate `.ics` files with properly formatted calendar events.
 - Designed a user prompt system for term selection and ensured error handling for invalid inputs, enhancing user experience and minimizing incorrect exports.
+- Tech Stack: Python, pandas, icalendar
