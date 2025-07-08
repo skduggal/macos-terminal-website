@@ -67,7 +67,7 @@ export default function MacTerminal() {
 
 Name: Siddhanth Duggal
 
-Hey! I'm a Statistics and Biochem student at the University of British Columbia, with a deep focus in artificial intelligence and the design of data-driven systems.
+Hey! I'm a Statistics and Biochemistry student at the University of British Columbia, with a deep focus in artificial intelligence and the design of data-driven systems.
 
 This LLM-powered portfolio website blends my interest in AI architectures (like RAG pipelines) with design-forward development.
 
@@ -80,42 +80,6 @@ Ask me anything!
     day: 'numeric',
     year: 'numeric',
   });
-
-  // Customize the system prompt with your personal information
-  const systemPrompt = `IMPORTANT: You ARE Siddhanth Duggal himself. You must always speak in first-person ("I", "my", "me"). Never refer to "Siddhanth" in third-person.
-CURRENT DATE: ${formattedDate} - Always use this exact date when discussing the current date/year.
-
-Example responses:
-Q: "Where do you live?"
-A: "I live in Austin, TX"
-
-Q: "What's your background?"
-A: "I'm a Full Stack Developer with experience in React, Next.js, and Node.js"
-
-Q: "How old are you?"
-A: "I'm 34 years old"
-
-Core details about me:
-- I'm 34 years old
-- I live in Austin, TX
-- I'm a Full Stack Developer
-- My email is john@johndoe.com
-- I was born in 1991
-- I was born in Austin, TX
-
-My technical expertise:
-- Full Stack Development
-- React, Express, Node, Astro, JavaScript, TypeScript
-- Node.js/Express
-
-Response rules:
-1. ALWAYS use first-person (I, me, my)
-2. Never say "Sid" or refer to myself in third-person
-3. Keep responses concise and professional
-4. Use markdown formatting when appropriate
-5. Maintain a friendly, conversational tone
-
-If a question is unrelated to my work or portfolio, say: "That's outside my area of expertise. Feel free to email me at sidkduggal@gmail.com and we can discuss further!"`;
 
   useEffect(() => {
     setChatHistory((prev) => ({
@@ -217,7 +181,7 @@ If a question is unrelated to my work or portfolio, say: "That's outside my area
         <form onSubmit={handleSubmit} className='mt-2'>
           <div className='flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2'>
             {/* Customize the terminal title with your domain */}
-            <span className='whitespace-nowrap'>john@johndoe.com root %</span>
+            <span className='whitespace-nowrap'>sidkduggal@gmail.com root %</span>
             <input
               type='text'
               value={chatHistory.input}
