@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { FaRegFolderClosed } from 'react-icons/fa6';
+import React from 'react';
 
 type Message = {
   role: 'system' | 'user' | 'assistant';
@@ -19,6 +20,23 @@ const PLACEHOLDER_MESSAGES = [
   'What are your skills?',
   'What projects have you worked on?',
 ];
+
+// ErrorBoundary component
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; error: any }> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true, error };
+  }
+  render() {
+    if (this.state.hasError) {
+      return <div style={{ color: 'red', padding: '1rem' }}>Something went wrong: {this.state.error?.toString()}</div>;
+    }
+    return this.props.children;
+  }
+}
 
 export default function MacTerminal() {
   const [chatHistory, setChatHistory] = useState<ChatHistory>({
@@ -151,47 +169,49 @@ Ask me anything!
   };
 
   return (
-    <div className='bg-black/75 w-[600px] h-[400px] rounded-lg overflow-hidden shadow-lg mx-4 sm:mx-0'>
-      <div className='bg-gray-800 h-6 flex items-center space-x-2 px-4'>
-        <div className='w-3 h-3 rounded-full bg-red-500'></div>
-        <div className='w-3 h-3 rounded-full bg-yellow-500'></div>
-        <div className='w-3 h-3 rounded-full bg-green-500'></div>
-        <span className='text-sm text-gray-300 flex-grow text-center font-semibold flex items-center justify-center gap-2'>
-          <FaRegFolderClosed size={14} className='text-gray-300' />
-          sidkd.com ⸺ zsh
-        </span>
-      </div>
-      <div className='p-4 text-gray-200 font-mono text-xs h-[calc(400px-1.5rem)] flex flex-col'>
-        <div className='flex-1 overflow-y-auto overflow-x-hidden'>
-          {chatHistory.messages.map((msg, index) => (
-            <div key={index} className='mb-2'>
-              {msg.role === 'user' ? (
-                <div className='flex items-start space-x-2'>
-                  <span className='text-green-400 flex-shrink-0'>{'>'}</span>
-                  <pre className='whitespace-pre-wrap break-words overflow-hidden flex-1'>{msg.content}</pre>
-                </div>
-              ) : (
-                <pre className='whitespace-pre-wrap break-words overflow-hidden'>{msg.content}</pre>
-              )}
-            </div>
-          ))}
-          {isTyping && <div className='animate-pulse'>...</div>}
-          <div ref={messagesEndRef} />
+    <ErrorBoundary>
+      <div className='bg-black/75 w-[600px] h-[400px] rounded-lg overflow-hidden shadow-lg mx-4 sm:mx-0'>
+        <div className='bg-gray-800 h-6 flex items-center space-x-2 px-4'>
+          <div className='w-3 h-3 rounded-full bg-red-500'></div>
+          <div className='w-3 h-3 rounded-full bg-yellow-500'></div>
+          <div className='w-3 h-3 rounded-full bg-green-500'></div>
+          <span className='text-sm text-gray-300 flex-grow text-center font-semibold flex items-center justify-center gap-2'>
+            <FaRegFolderClosed size={14} className='text-gray-300' />
+            sidkd.com ⸺ zsh
+          </span>
         </div>
-        <form onSubmit={handleSubmit} className='mt-2'>
-          <div className='flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2'>
-            {/* Customize the terminal title with your domain */}
-            <span className='whitespace-nowrap'>sidkduggal@gmail.com root %</span>
-            <input
-              type='text'
-              value={chatHistory.input}
-              onChange={handleInputChange}
-              className='w-full sm:flex-1 bg-transparent outline-none text-white placeholder-gray-400'
-              placeholder={placeholder}
-            />
+        <div className='p-4 text-gray-200 font-mono text-xs h-[calc(400px-1.5rem)] flex flex-col'>
+          <div className='flex-1 overflow-y-auto overflow-x-hidden'>
+            {chatHistory.messages.map((msg, index) => (
+              <div key={index} className='mb-2'>
+                {msg.role === 'user' ? (
+                  <div className='flex items-start space-x-2'>
+                    <span className='text-green-400 flex-shrink-0'>{'>'}</span>
+                    <pre className='whitespace-pre-wrap break-words overflow-hidden flex-1'>{msg.content}</pre>
+                  </div>
+                ) : (
+                  <pre className='whitespace-pre-wrap break-words overflow-hidden'>{msg.content}</pre>
+                )}
+              </div>
+            ))}
+            {isTyping && <div className='animate-pulse'>...</div>}
+            <div ref={messagesEndRef} />
           </div>
-        </form>
+          <form onSubmit={handleSubmit} className='mt-2'>
+            <div className='flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2'>
+              {/* Customize the terminal title with your domain */}
+              <span className='whitespace-nowrap'>sidkduggal@gmail.com root %</span>
+              <input
+                type='text'
+                value={chatHistory.input}
+                onChange={handleInputChange}
+                className='w-full sm:flex-1 bg-transparent outline-none text-white placeholder-gray-400'
+                placeholder={placeholder}
+              />
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+    </ErrorBoundary>
   );
 }
