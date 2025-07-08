@@ -5,6 +5,8 @@ import { PromptTemplate } from '@langchain/core/prompts';
 import path from 'path';
 import fs from 'fs';
 
+console.log("API /api/ask invoked (top-level)");
+
 const masterPrompt = PromptTemplate.fromTemplate(`
 # RESUME ASSISTANT INSTRUCTIONS
 
@@ -94,8 +96,10 @@ function routeQuestionToFile(question: string) {
 
 export const POST: APIRoute = async ({ request }) => {
   try {
+    console.log("/api/ask POST handler invoked");
     const { question } = await request.json();
     if (!question) {
+      console.log("No question provided");
       return new Response(JSON.stringify({ error: 'No question provided' }), { status: 400 });
     }
 
@@ -104,12 +108,14 @@ export const POST: APIRoute = async ({ request }) => {
       openAIApiKey: process.env.OPENAI_API_KEY,
       model: 'text-embedding-3-small',
     });
-    // On Vercel, use process.cwd() + '/public/faiss-index' to resolve the faiss-index directory
     const faissPath = path.resolve(process.cwd(), 'public/faiss-index');
+    console.log("Attempting to load FAISS index from:", faissPath);
     if (!fs.existsSync(faissPath)) {
+      console.error("FAISS index not found at:", faissPath);
       return new Response(JSON.stringify({ error: 'FAISS index not found' }), { status: 500 });
     }
     const store = await FaissStore.load(faissPath, embeddings);
+    console.log("FAISS index loaded successfully");
 
     // Hybrid RAG Retrieval
     const K = 8;
@@ -171,6 +177,7 @@ export const POST: APIRoute = async ({ request }) => {
     const answer = await chain.invoke({ question, context });
     return new Response(JSON.stringify({ answer: answer.content }), { status: 200 });
   } catch (e) {
+    console.error("❌ /api/ask error:", e);
     return new Response(JSON.stringify({ error: 'Server error', details: String(e) }), { status: 500 });
   }
 }; 
