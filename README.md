@@ -2,14 +2,14 @@
 
 An interactive, macOS-inspired developer portfolio designed by **Siddhanth Duggal**.
 
-This isn’t your typical portfolio. Alongside a sleek macOS-style UI, this site integrates a **Retrieval-Augmented Generation (RAG)** pipeline that allows visitors to interact with an AI agent trained specifically on my resume, projects, and career highlights.
+This isn't your typical portfolio. Alongside a sleek macOS-style UI, this site integrates a **Retrieval-Augmented Generation (RAG)** pipeline that allows visitors to interact with an AI agent trained specifically on my resume, projects, and career highlights.
 
 ---
 
 ### ⚡ What Makes This Unique?
 
 ✅ **RAG-Powered Terminal Chat**  
-The macOS terminal is fully interactive and leverages an advanced **LLM + vector store architecture** to provide intelligent responses. Visitors can query the AI about my work experience, projects, or skills, and receive answers grounded in actual documents I’ve authored. 
+The macOS terminal is fully interactive and leverages an advanced **LLM + vector store architecture** to provide intelligent responses. Visitors can query the AI about my work experience, projects, or skills, and receive answers grounded in actual documents I've authored. 
 
 ✅ **Multi-Stage Retrieval Pipeline**  
 The system combines semantic search using vector similarity with contextual re-ranking to ensure only the most relevant data is passed to the LLM. This allows for nuanced, high-accuracy answers even to open-ended queries.
@@ -24,12 +24,12 @@ The AI agent dynamically decides whether to fetch from the knowledge base, use G
 
 ### 🛠 Tech Stack & Architecture
 
-- **Astro** – Static site generator for high performance and fast page loads  
+- **Astro** – Modern web framework for high performance and fast page loads  
 - **React** – Renders interactive components like the terminal and dock  
 - **TypeScript** – Provides type safety and maintainability across the project  
 - **Tailwind CSS** – For utility-first responsive styling  
 - **OpenAI GPT-4** – Powers the natural language understanding and generation  
-- **Pinecone Vector DB** – Stores vector embeddings of knowledge sources for efficient semantic retrieval  
+- **Qdrant Cloud Vector DB** – Stores vector embeddings of knowledge sources for efficient semantic retrieval  
 - **LangChain** – Handles RAG orchestration, including document chunking, embedding, retrieval, and prompt engineering  
 
 ---
@@ -37,27 +37,41 @@ The AI agent dynamically decides whether to fetch from the knowledge base, use G
 ### 🧠 Technical Implementation Details
 
 1. **Document Ingestion & Embedding**  
-   - Key documents (resume, GitHub READMEs, and articles) are processed and embedded using OpenAI’s `text-embedding-ada-002` model.
-   - Each document is split into contextually coherent chunks with metadata tags for provenance tracking.
+   - Key documents (resume, experience, skills, projects, etc.) in `/data/*.txt` are processed and embedded using OpenAI's `text-embedding-3-small` model.
+   - Each document is split into contextually coherent chunks using a sliding window (400 chars, 100 overlap) with metadata tags for provenance tracking.
+   - Embeddings are uploaded to Qdrant Cloud using the ingestion script in `backend/embed-knowledge.js`.
 
 2. **Vector Storage**  
-   - Embeddings are stored in Pinecone for efficient approximate nearest neighbor search.
+   - Embeddings are stored in Qdrant Cloud for efficient approximate nearest neighbor search.
    - Queries are vectorized in real time and matched against this index.
 
 3. **Retriever + Generator (RAG)**  
    - LangChain manages retrieval and constructs prompts for GPT-4 with retrieved chunks, allowing the LLM to respond with grounded answers.
-   - Implements a **hybrid retrieval strategy**: semantic similarity + keyword matching for fallback.
+   - Implements a **hybrid retrieval strategy**: semantic similarity + prompt-based synthesis for high-quality, recruiter-ready answers.
 
-4. **Terminal UI Integration**  
+4. **Serverless API Backend**  
+   - The `/api/ask` route (Astro API endpoint) handles RAG logic, using Qdrant for retrieval and OpenAI for LLM synthesis.
+   - No separate Express server is needed; the backend is fully serverless and Vercel-compatible.
+
+5. **Terminal UI Integration**  
    - AI responses are piped into a macOS-styled terminal UI built with React, maintaining the illusion of a native system interface.
 
-5. **Query Routing Logic**  
-   - Custom middleware distinguishes between RAG-required queries, local terminal commands, and fallback GPT reasoning.
+---
+
+### 🌐 Deployment & Environment Variables
+
+To deploy on Vercel or locally, set the following environment variables:
+
+- `OPENAI_API_KEY` – Your OpenAI API key
+- `QDRANT_URL` – Your Qdrant Cloud cluster URL
+- `QDRANT_API_KEY` – Your Qdrant Cloud API key
+
+You can add these to a `.env` file in the project root or set them in your Vercel dashboard.
 
 ---
 
 ### About Me
 
-I’m **Siddhanth Duggal**, a BSc student in Statistics & Biochemistry at UBC with a focus on applied AI and quant finance. This portfolio demonstrates my ability to design **end-to-end AI systems**, from vector databases to UI integration, while keeping a focus on user-centric design.
+I'm **Siddhanth Duggal**, a BSc student in Statistics & Biochemistry at UBC with a focus on applied AI and quant finance. This portfolio demonstrates my ability to design **end-to-end AI systems**, from vector databases to UI integration, while keeping a focus on user-centric design.
 
-> *“If ChatGPT and macOS had a baby, it would be this portfolio.”*
+> *"If ChatGPT and macOS had a baby, it would be this portfolio."*
