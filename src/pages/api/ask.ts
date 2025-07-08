@@ -1,6 +1,5 @@
 import type { APIRoute } from 'astro';
 import { OpenAIEmbeddings, ChatOpenAI } from '@langchain/openai';
-// @ts-expect-error: faiss community package may not have types, but works at runtime
 import { FaissStore } from '@langchain/community/vectorstores/faiss';
 import { PromptTemplate } from '@langchain/core/prompts';
 import path from 'path';
@@ -118,7 +117,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Keyword/file routing
     const file = routeQuestionToFile(question);
-    let fileChunks = [];
+    let fileChunks: any[] = [];
     if (file) {
       const allDocs = await store.similaritySearch(' ', 1000);
       fileChunks = allDocs.filter((doc: any) => doc.metadata && doc.metadata.source === file);
