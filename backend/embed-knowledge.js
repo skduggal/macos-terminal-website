@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import { OpenAIEmbeddings } from "@langchain/openai";
-import { FaissStore } from "@langchain/community/vectorstores/faiss";
+import { QdrantVectorStore } from "@langchain/community/vectorstores/qdrant";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -24,43 +24,55 @@ if (!fs.existsSync(dataDir)) {
   process.exit(1);
 }
 
+function chunkTextSlidingWindow(text, chunkSize = 400, overlap = 100) {
+  const chunks = [];
+  let start = 0;
+  while (start < text.length) {
+    const end = Math.min(start + chunkSize, text.length);
+    const chunk = text.slice(start, end);
+    chunks.push(chunk.trim());
+    if (end === text.length) break;
+    start += chunkSize - overlap;
+  }
+  return chunks.filter(Boolean);
+}
+
 const documents = [];
 for (const file of fs.readdirSync(dataDir)) {
   if (!file.endsWith(".txt")) continue;
   const text = fs.readFileSync(path.join(dataDir, file), "utf8");
-  // Split by double newlines (section/paragraph)
-  const sections = text.split(/\n{2,}/).map(s => s.trim()).filter(Boolean);
-  for (let i = 0; i < sections.length; i++) {
-    const sectionText = sections[i];
-    // Use first non-empty line as section title (if looks like a header)
-    let sectionTitle = sectionText.split("\n").find(line => line.trim().length > 0) || "Section";
-    // Heuristic: if sectionTitle is all-caps or ends with ':' or '|', treat as title, else fallback to file name
-    if (!/^([A-Z\s\-\|:]+|.+:|.+\|)$/.test(sectionTitle.trim())) {
-      sectionTitle = file;
-    }
+  // Use sliding window chunking for richer context
+  const chunks = chunkTextSlidingWindow(text, 400, 100);
+  for (let i = 0; i < chunks.length; i++) {
     documents.push({
       id: `${file}__${i}`,
-      text: sectionText,
+      text: chunks[i],
       metadata: {
         source: file,
-        section: sectionTitle.trim(),
         chunkIndex: i
       },
     });
   }
 }
 
-// 3) Embed & persist locally
+// 3) Embed & push to Qdrant Cloud
 async function run() {
   const texts = documents.map(d => d.text);
   const metadatas = documents.map(d => d.metadata);
 
-  // Create FAISS vector store
-  const store = await FaissStore.fromTexts(texts, metadatas, embeddings);
-  // Save the FAISS index to disk
-  await store.save("faiss-index");
+  // Create Qdrant vector store (pushes to remote Qdrant Cloud)
+  const store = await QdrantVectorStore.fromTexts(
+    texts,
+    metadatas,
+    embeddings,
+    {
+      url: process.env.QDRANT_URL,
+      apiKey: process.env.QDRANT_API_KEY,
+      collectionName: "portfolio-knowledge",
+    }
+  );
 
-  console.log(`✅ Embedded ${documents.length} chunks into local FAISS index`);
+  console.log(`✅ Embedded ${documents.length} chunks into Qdrant Cloud collection`);
   process.exit(0);
 }
 
