@@ -104,8 +104,8 @@ export const POST: APIRoute = async ({ request }) => {
       openAIApiKey: process.env.OPENAI_API_KEY,
       model: 'text-embedding-3-small',
     });
-    // On Vercel, use process.cwd() to resolve the faiss-index directory
-    const faissPath = path.resolve(process.cwd(), 'backend/faiss-index');
+    // On Vercel, use process.cwd() + '/public/faiss-index' to resolve the faiss-index directory
+    const faissPath = path.resolve(process.cwd(), 'public/faiss-index');
     if (!fs.existsSync(faissPath)) {
       return new Response(JSON.stringify({ error: 'FAISS index not found' }), { status: 500 });
     }
