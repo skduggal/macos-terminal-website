@@ -20,6 +20,13 @@ export default defineConfig({
         '/api': 'http://localhost:5050',
       },
     },
+    build: {
+      rollupOptions: {
+        external: [
+          '@langchain/community/vectorstores/faiss'
+        ]
+      }
+    }
   },
 
   // Required integrations
