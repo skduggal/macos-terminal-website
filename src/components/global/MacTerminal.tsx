@@ -144,11 +144,16 @@ Ask me anything!
 
       const data = await response.json();
 
+      // The backend returns { context: string[] }, join for display
+      const answer = Array.isArray(data.context)
+        ? data.context.join('\n\n')
+        : (data.answer || 'No answer found.');
+
       setChatHistory((prev) => ({
         ...prev,
         messages: [
           ...prev.messages,
-          { role: 'assistant', content: data.answer },
+          { role: 'assistant', content: answer },
         ],
       }));
     } catch (error) {
