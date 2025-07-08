@@ -182,7 +182,7 @@ Ask me anything!
           <div className='w-3 h-3 rounded-full bg-green-500'></div>
           <span className='text-sm text-gray-300 flex-grow text-center font-semibold flex items-center justify-center gap-2'>
             <FaRegFolderClosed size={14} className='text-gray-300' />
-            sidkd.com ⸺ zsh
+            Sid's resume assistant ⸺ zsh
           </span>
         </div>
         <div className='p-4 text-gray-200 font-mono text-xs h-[calc(400px-1.5rem)] flex flex-col'>
