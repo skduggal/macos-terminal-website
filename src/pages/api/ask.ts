@@ -3,6 +3,7 @@ import { QdrantVectorStore } from '@langchain/community/vectorstores/qdrant';
 import { OpenAIEmbeddings } from '@langchain/openai';
 
 export const POST: APIRoute = async ({ request }) => {
+  console.log('API /api/ask called'); // Log at the very top for Vercel debugging
   try {
     const { question } = await request.json();
     if (!question) {
