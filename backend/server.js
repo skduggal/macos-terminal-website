@@ -151,16 +151,28 @@ async function start() {
       const { question } = req.body;
       if (!question) return res.status(400).json({ error: "No question provided" });
 
-      // Hybrid RAG Retrieval
-      const K = 8;
+      // ENHANCED HYBRID RAG RETRIEVAL
+      const K = 12; // Increased from 8 for better coverage
       const semanticChunks = await store.similaritySearch(question, K);
 
-      // Keyword/file routing
-      const file = routeQuestionToFile(question);
+      // Check if question is ambiguous (no clear keywords)
+      const isAmbiguous = !/\b(project|experience|skill|education|about|contact|work|job|internship|company|role|built|developed|created|studied|degree|university|school|college|academic|email|phone|location|reach|touch|background|bio|who|passion|hobby|interest|book|reading|poker|gym|exercise|personal|tell|yourself)\b/i.test(question);
+      
       let fileChunks = [];
-      if (file) {
-        const allDocs = await store.similaritySearch(" ", 1000);
-        fileChunks = allDocs.filter(doc => doc.metadata && doc.metadata.source === file);
+      if (isAmbiguous) {
+        // For ambiguous questions, get broader context from all files
+        const generalTerms = ['background', 'experience', 'projects', 'skills', 'education'];
+        for (const term of generalTerms) {
+          const termResults = await store.similaritySearch(term, 3);
+          fileChunks.push(...termResults);
+        }
+      } else {
+        // For clear keyword questions, use the original file routing
+        const file = routeQuestionToFile(question);
+        if (file) {
+          const allDocs = await store.similaritySearch(" ", 1000);
+          fileChunks = allDocs.filter(doc => doc.metadata && doc.metadata.source === file);
+        }
       }
 
       // Merge and deduplicate
@@ -206,7 +218,9 @@ async function start() {
       res.json({ answer: answer.content });
     } catch (e) {
       console.error("❌ /api/ask error:", e);
-      res.status(500).json({ error: "Server error" });
+      // Provide helpful error response instead of generic error
+      const helpfulError = "I'm having trouble processing that right now. You can ask me about my projects, work experience, skills, education, or background. Or feel free to email me at sidkduggal@gmail.com for more information.";
+      res.json({ answer: helpfulError });
     }
   });
 

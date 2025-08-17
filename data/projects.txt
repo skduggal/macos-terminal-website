@@ -18,7 +18,7 @@ Email Spam Filtering Using K-NN
 - Trained and tested the model to achieve an accuracy of 84.36%.
 - Tech Stack: R
 
-macOS Terminal Portfolio
+RAG-powered AI Resume Assistent
 - Integrated OpenAI GPT API to power an AI terminal chat experience capable of answering questions about education, work experience, and technical skills.
 - Implemented Retrieval-Augmented Generation (RAG) architecture using Pinecone and LangChain to ground AI responses in my personal resume and project data.
 - Developed the front-end using Astro, React, and TailwindCSS, achieving a modern and responsive design optimized for desktop and mobile devices.
@@ -30,3 +30,5 @@ Workday2iCal
 - Used the icalendar library to dynamically generate `.ics` files with properly formatted calendar events.
 - Designed a user prompt system for term selection and ensured error handling for invalid inputs, enhancing user experience and minimizing incorrect exports.
 - Tech Stack: Python, pandas, icalendar
+
+- Leverage OpenAI GPT API to power an AI terminal chat experience capable of answering questions about education, work experience, and technical skills made using leveraging TypeScript/JavaScript, Astro, and React.

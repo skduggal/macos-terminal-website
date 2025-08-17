@@ -3,28 +3,53 @@ import { QdrantVectorStore } from '@langchain/community/vectorstores/qdrant';
 import { OpenAIEmbeddings, ChatOpenAI } from '@langchain/openai';
 import { PromptTemplate } from '@langchain/core/prompts';
 
-// MASTER PROMPT - ported from backend/server.js
+// ENHANCED MASTER PROMPT - Improved for better handling of ambiguous questions
 const masterPrompt = PromptTemplate.fromTemplate(`
 # RESUME ASSISTANT INSTRUCTIONS
 
 ## ROLE
-You are Siddhanth Duggal's resume assistant. Map user questions to the correct file and generate professional responses for recruiters.
+You are Siddhanth Duggal's resume assistant. You have access to comprehensive information about his background, experience, projects, and skills. Your job is to provide helpful, accurate responses based on the available context.
 
-**INTRO MESSAGE:** 
-- **INTRO TEXT:** "Hi! I'm Sid's resume assistant. I can help you learn about his projects, experience, skills, education, and background. What would you like to know?"
-- ONLY show intro when:
-  - Someone asks general questions like "what can you help me with?", "what can you do?", "help me"
-  - Someone says just "hi", "hello", or similar greetings without specific questions
-  - Do NOT output this in any other case
+## INTELLIGENT RESPONSE STRATEGY
 
-## KEYWORD MAPPING
-**Priority order:**
-- **"projects", "project", "built", "developed", "created"** → projects.txt
-- **"experience", "experiences", "work", "worked", "job", "jobs", "internship", "internships", "career", "employment", "positions"** → experience.txt
-- **"skills", "technologies", "tech stack", "programming"** → skills.txt
-- **"education", "study", "degree", "university"** → education.txt
-- **"contact", "email", "phone", "location"** → personal details.txt
-- **"about", "bio", "who are you", "background", "passion", "passions", "hobbies", "interests", "enjoy", "love", "like", "books", "reading"** → about.txt
+**For ANY question, follow this priority order:**
+
+1. **DIRECT MATCHES:** If the question clearly maps to specific content (projects, experience, skills, etc.), provide that information in the specified format.
+
+2. **SEMANTIC UNDERSTANDING:** If the question is ambiguous or doesn't contain obvious keywords, use semantic understanding to:
+   - Identify the intent behind the question
+   - Find the most relevant information from the context
+   - Provide a helpful response that addresses the user's underlying question
+
+3. **CONTEXTUAL INFERENCE:** For questions that don't directly match any category:
+   - Analyze what the user is likely asking about
+   - Provide relevant information from the context
+   - If appropriate, suggest related topics they might be interested in
+
+4. **FALLBACK RESPONSES:** If the question is completely outside your knowledge:
+   - Politely explain what you can help with
+   - Provide a brief overview of available topics
+   - Encourage them to ask about specific areas
+
+## KEYWORD MAPPING (Enhanced)
+**Priority order with semantic understanding:**
+- **"projects", "project", "built", "developed", "created", "work on", "built", "made"** → projects.txt
+- **"experience", "experiences", "work", "worked", "job", "jobs", "internship", "internships", "career", "employment", "positions", "company", "role"** → experience.txt
+- **"skills", "technologies", "tech stack", "programming", "languages", "tools", "technologies"** → skills.txt
+- **"education", "study", "degree", "university", "school", "college", "academic"** → education.txt
+- **"contact", "email", "phone", "location", "reach out", "get in touch"** → personal details.txt
+- **"about", "bio", "who are you", "background", "passion", "passions", "hobbies", "interests", "enjoy", "love", "like", "books", "reading", "poker", "gym", "hobby", "your hobbies", "exercise", "personal", "tell me about yourself"** → about.txt
+
+## SEMANTIC QUESTION HANDLING
+
+**For ambiguous questions, use these strategies:**
+
+1. **"What do you do?" / "Tell me about yourself"** → Provide a professional summary from about.txt + key highlights
+2. **"What are you good at?" / "What are your strengths?"** → Combine skills + key achievements from experience
+3. **"What should I know about you?"** → Professional summary + most impressive projects/experiences
+4. **"Why should I hire you?"** → Key achievements + technical skills + relevant experience
+5. **"What makes you unique?"** → Unique combination of skills + background + achievements
+6. **General questions without keywords** → Provide a helpful overview based on context relevance
 
 ## TONE GUIDELINES:
 - Conversational but professional: Use natural, friendly language while maintaining credibility
@@ -39,7 +64,7 @@ You are Siddhanth Duggal's resume assistant. Map user questions to the correct f
 ## FORMATTING RULES
 
 **PROJECTS & EXPERIENCE:**
-- **INTRO MESSAGE:** Start with friendly yet proffessional and brief intro before listing items
+- **INTRO MESSAGE:** Start with friendly yet professional and brief intro before listing items
 
 - **MANDATORY FORMAT FOR ALL MENTIONS OF EXPERIENCES:** Use hierarchical bullet structure only
 - **Main bullet (•):** Company | Job Title | Duration (e.g., "Zamp | AI and Go-To-Market Intern | May 2025 – Aug 2025")
@@ -99,6 +124,35 @@ QUESTION:
 ANSWER:
 `);
 
+// FALLBACK PROMPT for completely ambiguous questions
+const fallbackPrompt = PromptTemplate.fromTemplate(`
+You are Siddhanth Duggal's resume assistant. The user asked a question that doesn't clearly map to specific categories in your knowledge base.
+
+Based on the available context about Siddhanth, provide a helpful response that:
+
+1. **Acknowledges their question** and shows you understand what they're asking
+2. **Provides relevant information** from the context that might be helpful
+3. **Suggests specific topics** they could ask about for more detailed information
+
+Available topics you can help with:
+- My projects and technical work
+- My work experience and internships  
+- My technical skills and technologies
+- My education and academic background
+- My personal background and interests
+- How to contact me
+
+Use first person ("I", "my", "me") when speaking as Siddhanth. Be conversational and helpful.
+
+CONTEXT:
+{context}
+
+QUESTION:
+{question}
+
+HELPFUL RESPONSE:
+`);
+
 export const POST: APIRoute = async ({ request }) => {
   try {
     const { question } = await request.json();
@@ -120,18 +174,51 @@ export const POST: APIRoute = async ({ request }) => {
       }
     );
 
-    // Retrieve top 8 relevant chunks for richer context
-    const results = await vectorStore.similaritySearch(question, 8);
-    const context = results.map((r: { pageContent: string }) => r.pageContent).join('\n');
+    // ENHANCED RETRIEVAL STRATEGY
+    // 1. Primary semantic search with higher k for better coverage
+    const primaryResults = await vectorStore.similaritySearch(question, 12);
+    
+    // 2. Fallback: If question is ambiguous, also search for general terms
+    const isAmbiguous = !/\b(project|experience|skill|education|about|contact|work|job|internship|company|role|built|developed|created|studied|degree|university|school|college|academic|email|phone|location|reach|touch|background|bio|who|passion|hobby|interest|book|reading|poker|gym|exercise|personal|tell|yourself)\b/i.test(question);
+    
+    let fallbackResults = [];
+    if (isAmbiguous) {
+      // Search for general terms to get broader context
+      const generalTerms = ['background', 'experience', 'projects', 'skills', 'education'];
+      for (const term of generalTerms) {
+        const termResults = await vectorStore.similaritySearch(term, 3);
+        fallbackResults.push(...termResults);
+      }
+    }
+    
+    // 3. Combine and deduplicate results
+    const allResults = [...primaryResults, ...fallbackResults];
+    const uniqueResults = allResults.filter((result, index, self) => 
+      index === self.findIndex(r => r.pageContent === result.pageContent)
+    );
+    
+    // 4. Take top 10 most relevant chunks
+    const context = uniqueResults.slice(0, 10).map((r: { pageContent: string }) => r.pageContent).join('\n');
 
-    // Call LLM with master prompt
+    // Initialize LLM
     const llm = new ChatOpenAI({
       openAIApiKey: process.env.OPENAI_API_KEY,
       modelName: 'gpt-4o',
       temperature: 0.7,
     });
-    const chain = masterPrompt.pipe(llm);
-    const answer = await chain.invoke({ question, context });
+
+    let answer;
+    
+    // Use fallback prompt for highly ambiguous questions
+    if (isAmbiguous && uniqueResults.length < 3) {
+      // Very ambiguous question with limited context - use fallback
+      const fallbackChain = fallbackPrompt.pipe(llm);
+      answer = await fallbackChain.invoke({ question, context });
+    } else {
+      // Use main prompt for most questions
+      const chain = masterPrompt.pipe(llm);
+      answer = await chain.invoke({ question, context });
+    }
 
     return new Response(JSON.stringify({ answer: answer.content }), { status: 200 });
   } catch (err: any) {
@@ -139,6 +226,10 @@ export const POST: APIRoute = async ({ request }) => {
     if (err && err.stack) {
       console.error('Stack trace:', err.stack);
     }
-    return new Response(JSON.stringify({ error: 'Internal server error', details: err?.message || String(err) }), { status: 500 });
+    
+    // Provide a helpful error response instead of generic error
+    const helpfulError = "I'm having trouble processing that right now. You can ask me about my projects, work experience, skills, education, or background. Or feel free to email me at sidkduggal@gmail.com for more information.";
+    
+    return new Response(JSON.stringify({ answer: helpfulError }), { status: 200 });
   }
 }; 
