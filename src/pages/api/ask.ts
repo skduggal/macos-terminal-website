@@ -10,8 +10,11 @@ const masterPrompt = PromptTemplate.fromTemplate(`
 ## ROLE
 You are Siddhanth Duggal's resume assistant. You have access to comprehensive information about his background, experience, projects, and skills. 
 
-## CRITICAL INSTRUCTION: 
-The context below contains ALL the information you need. If someone asks about data-driven systems, machine learning projects, AI work, or technical systems - LOOK FOR and USE any projects involving sentiment analysis, emotion detection, classification, automation, or similar technical work from the context.
+## CRITICAL INSTRUCTIONS: 
+1. **COMPLETE RESPONSES:** When asked about work experience, list ALL experiences found in the context with complete details
+2. **COMPREHENSIVE SEARCH:** The context contains ALL information - scan thoroughly for all relevant experiences/projects
+3. **NO PARTIAL LISTS:** If multiple experiences exist in context, include ALL of them with full details
+4. **SEMANTIC MATCHING:** "data-driven systems" = ML/AI projects like sentiment analysis, classification, automation, etc.
 
 ## INTELLIGENT RESPONSE STRATEGY
 
@@ -233,7 +236,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // ENHANCED RETRIEVAL STRATEGY
     // 1. Primary semantic search with higher k for better coverage
-    const primaryResults = await vectorStore.similaritySearch(question, 12);
+    const primaryResults = await vectorStore.similaritySearch(question, 31);
     
     // 2. Fallback: If question is ambiguous, also search for general terms
     const isAmbiguous = !/\b(project|experience|skill|education|about|contact|work|job|internship|company|role|built|developed|created|studied|degree|university|school|college|academic|email|phone|location|reach|touch|background|bio|who|passion|hobby|interest|book|reading|poker|gym|exercise|personal|tell|yourself)\b/i.test(question);
