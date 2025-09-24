@@ -290,6 +290,23 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: 'Missing question' }), { status: 400 });
     }
 
+    // Environment validation
+    const requiredEnvVars = {
+      OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+      QDRANT_URL: process.env.QDRANT_URL,
+      QDRANT_API_KEY: process.env.QDRANT_API_KEY
+    };
+
+    const missingVars = Object.entries(requiredEnvVars)
+      .filter(([key, value]) => !value)
+      .map(([key]) => key);
+
+    if (missingVars.length > 0) {
+      console.error(`❌ Missing environment variables: ${missingVars.join(', ')}`);
+      const errorMessage = `Configuration issue: Missing ${missingVars.join(', ')}. You can ask me about my projects, work experience, skills, education, or background. Or feel free to email me at sidkduggal@gmail.com for more information.`;
+      return new Response(JSON.stringify({ answer: errorMessage }), { status: 200 });
+    }
+
     // Load Qdrant vector store from Qdrant Cloud
     const embeddings = new OpenAIEmbeddings({
       openAIApiKey: process.env.OPENAI_API_KEY,
@@ -304,39 +321,99 @@ export const POST: APIRoute = async ({ request }) => {
       }
     );
 
-    // SOURCE-AWARE RETRIEVAL STRATEGY - Prevents context contamination
+    // ROBUST SOURCE-AWARE RETRIEVAL STRATEGY with Fallback
     const targetFiles = determineTargetFiles(question);
     console.log(`🎯 Targeting files: ${targetFiles.join(', ')} for question: "${question}"`);
 
     let retrievalResults = [];
+    let context = '';
 
-    if (targetFiles.length <= 2) {
-      // Specific query - use targeted search with source filtering
-      for (const file of targetFiles) {
-        const fileResults = await vectorStore.similaritySearchWithScore(question, 8, {
-          must: [{
-            key: 'source',
-            match: { value: file }
-          }]
-        });
-        retrievalResults.push(...fileResults);
+    try {
+      // Try source filtering first (advanced approach)
+      if (targetFiles.length <= 2 && targetFiles.length > 0) {
+        console.log(`🔍 Attempting source filtering for: ${targetFiles.join(', ')}`);
+
+        try {
+          // Try different filtering syntax options for compatibility
+          for (const file of targetFiles) {
+            let fileResults = [];
+
+            // Method 1: Try newer LangChain syntax
+            try {
+              fileResults = await vectorStore.similaritySearchWithScore(question, 6, {
+                filter: { source: file }
+              });
+            } catch (e1) {
+              console.log(`Method 1 failed for ${file}, trying Method 2...`);
+
+              // Method 2: Try Qdrant-specific syntax
+              try {
+                fileResults = await vectorStore.similaritySearchWithScore(question, 6, {
+                  must: [{ key: 'source', match: { value: file } }]
+                });
+              } catch (e2) {
+                console.log(`Method 2 failed for ${file}, trying Method 3...`);
+
+                // Method 3: Try basic filter
+                try {
+                  fileResults = await vectorStore.similaritySearchWithScore(question, 6, {
+                    where: { source: { $eq: file } }
+                  });
+                } catch (e3) {
+                  console.log(`All filtering methods failed for ${file}, will use fallback`);
+                  fileResults = []; // Will trigger fallback
+                }
+              }
+            }
+
+            if (fileResults.length > 0) {
+              retrievalResults.push(...fileResults);
+            }
+          }
+        } catch (filterError) {
+          console.log(`🚨 Source filtering completely failed:`, filterError.message);
+          retrievalResults = []; // Trigger fallback
+        }
       }
-    } else {
-      // Broad query - use general search but with lower k to avoid contamination
-      const generalResults = await vectorStore.similaritySearchWithScore(question, 12);
-      retrievalResults.push(...generalResults);
+
+      // Fallback: If filtering failed or broad query, use general search
+      if (retrievalResults.length === 0) {
+        console.log(`📂 Using fallback: general similarity search`);
+        const fallbackResults = await vectorStore.similaritySearchWithScore(question, 12);
+        retrievalResults = fallbackResults;
+      }
+
+      // Sort by relevance score and take top results
+      retrievalResults.sort((a, b) => a[1] - b[1]); // Lower score = more similar
+      const topResults = retrievalResults.slice(0, 8).map(([doc, score]) => doc);
+
+      // Post-process results to filter by target files if filtering didn't work
+      let filteredResults = topResults;
+      if (targetFiles.length <= 2 && targetFiles.length > 0) {
+        const targetFileSet = new Set(targetFiles);
+        filteredResults = topResults.filter((r: any) => {
+          const source = r.metadata?.source;
+          return !source || targetFileSet.has(source);
+        });
+
+        // If post-filtering removes too many results, use all results
+        if (filteredResults.length < 3) {
+          filteredResults = topResults;
+        }
+      }
+
+      // Add explicit source labels to prevent mixing
+      context = filteredResults.map((r: any) => {
+        const source = r.metadata?.source || 'unknown';
+        const sourceLabel = source.replace('.txt', '').toUpperCase();
+        return `[${sourceLabel}]: ${r.pageContent}`;
+      }).join('\n\n');
+
+    } catch (retrievalError) {
+      console.log(`🚨 Complete retrieval failure:`, retrievalError.message);
+      // Last resort fallback
+      context = "Unable to retrieve specific context. Please provide more details about what you'd like to know.";
     }
-
-    // Sort by relevance score and take top results
-    retrievalResults.sort((a, b) => a[1] - b[1]); // Lower score = more similar
-    const topResults = retrievalResults.slice(0, 8).map(([doc, score]) => doc);
-
-    // Add explicit source labels to prevent mixing
-    const context = topResults.map((r: any) => {
-      const source = r.metadata?.source || 'unknown';
-      const sourceLabel = source.replace('.txt', '').toUpperCase();
-      return `[${sourceLabel}]: ${r.pageContent}`;
-    }).join('\n\n');
 
     // Initialize LLM
     const llm = new ChatOpenAI({
@@ -350,18 +427,32 @@ export const POST: APIRoute = async ({ request }) => {
     console.log(`🎯 Using ${promptType} prompt for question: "${question}"`);
 
     let answer;
-    
-    if (promptType === 'conversational') {
-      // Use conversational prompt for natural, ambiguous questions
-      const conversationalChain = conversationalPrompt.pipe(llm);
-      answer = await conversationalChain.invoke({ question, context });
-    } else {
-      // Use structured prompt for direct, specific questions
-      const structuredChain = masterPrompt.pipe(llm);
-      answer = await structuredChain.invoke({ question, context });
-    }
 
-    return new Response(JSON.stringify({ answer: answer.content }), { status: 200 });
+    try {
+      if (promptType === 'conversational') {
+        // Use conversational prompt for natural, ambiguous questions
+        const conversationalChain = conversationalPrompt.pipe(llm);
+        answer = await conversationalChain.invoke({ question, context });
+      } else {
+        // Use structured prompt for direct, specific questions
+        const structuredChain = masterPrompt.pipe(llm);
+        answer = await structuredChain.invoke({ question, context });
+      }
+
+      if (!answer || !answer.content) {
+        throw new Error('Empty response from LLM');
+      }
+
+      return new Response(JSON.stringify({ answer: answer.content }), { status: 200 });
+
+    } catch (llmError) {
+      console.error('❌ LLM processing error:', llmError.message);
+
+      // Fallback response that still provides value
+      const fallbackAnswer = `I encountered a technical issue processing your question about "${question}". However, I'm here to help you learn about my professional background! You can ask me about my work experience at companies like Zamp, iKites.AI, EY, and Medanta, my technical projects including sentiment analysis and ML work, my skills in Python, R, and machine learning, or my education at UBC. What would you like to know?`;
+
+      return new Response(JSON.stringify({ answer: fallbackAnswer }), { status: 200 });
+    }
   } catch (err: any) {
     console.error('❌ /api/ask error:', err);
     if (err && err.stack) {
