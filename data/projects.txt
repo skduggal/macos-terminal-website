@@ -32,5 +32,3 @@ Workday2iCal
 - Used the icalendar library to dynamically generate `.ics` files with properly formatted calendar events.
 - Designed a user prompt system for term selection and ensured error handling for invalid inputs, enhancing user experience and minimizing incorrect exports.
 - Tech Stack: Python, pandas, icalendar
-
-- Leverage OpenAI GPT API to power an AI terminal chat experience capable of answering questions about education, work experience, and technical skills made using leveraging TypeScript/JavaScript, Astro, and React.

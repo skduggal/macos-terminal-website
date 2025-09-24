@@ -3,8 +3,7 @@ WORK EXPERIENCE
 Zamp | May 2025 – Aug 2025
 AI and Go-To-Market Intern
 - Working at a Sequoia-backed agentic AI startup building autonomous workflows for finance operations at enterprises like Uber, DoorDash and Wio Bank.
-- Spearheaded development on an AP automation agent that extracted invoice data and executed 2-way PO matching using document and decision agents - cutting AP processing costs by 60% for enterprise users.
-- Built a transaction-screening AI agent on Pantheon/Temporal to match flagged payments to high-risk entities (~5K alerts/day), achieving 95% true-match accuracy and 60%+ cost savings for a bank client.
+- Spearheaded development on a transaction-screening AI agent on Pantheon/Temporal to match flagged payments to high-risk entities (~5K alerts/day), achieving 95% true-match accuracy and 60%+ cost savings for a bank client.
 - Developed and deployed Morpheus and Trinity: internal AI InfoSec agents using semantic search + RAG (OpenAI embeddings + Qdrant) on 60+ documents to answer compliance queries in Slack and complete 200+ InfoSec assessments in Google Sheets, reducing manual effort by 70%.
 
 iKites.AI | Jul 2024 – Dec 2024
