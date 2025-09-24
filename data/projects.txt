@@ -18,11 +18,18 @@ Email Spam Filtering Using K-NN
 - Trained and tested the model to achieve an accuracy of 84.36%.
 - Tech Stack: R
 
-RAG-powered AI Resume Assistent
-- Integrated OpenAI GPT API to power an AI terminal chat experience capable of answering questions about education, work experience, and technical skills.
-- Implemented Retrieval-Augmented Generation (RAG) architecture using Pinecone and LangChain to ground AI responses in my personal resume and project data.
-- Developed the front-end using Astro, React, and TailwindCSS, achieving a modern and responsive design optimized for desktop and mobile devices.
-- Tech Stack: OpenAI GPT API, Pinecone, LangChain, Astro, React, TailwindCSS
+macOS Terminal Portfolio
+- Built an intelligent AI resume assistant with a terminal-style interface capable of answering questions about education, work experience, projects, and technical skills
+- Implemented Retrieval-Augmented Generation (RAG) architecture using Qdrant vector database and LangChain to ground AI responses in personal resume and project data
+- Designed a dual-prompt system with intelligent question classification to handle both structured queries and conversational interactions
+- Developed responsive front-end using Astro, React, and TailwindCSS with authentic macOS terminal aesthetics
+- Tech Stack: OpenAI GPT-4, Qdrant, LangChain, Astro, React, TailwindCSS, Node.js
+- Designed a dual-prompt system with regex-based pattern matching and intelligent question classification to differentiate between structured data queries and conversational interactions
+- Developed vector embedding pipeline that chunks text documents using sliding window approach (400 char chunks, 100 char overlap) and stores embeddings in Qdrant Cloud collection
+- Built Express.js backend API with CORS support and error handling, featuring dynamic prompt selection and context retrieval with configurable similarity search parameters
+- Implemented frontend using Astro SSG framework with React components, TypeScript for type safety, and TailwindCSS for responsive styling with authentic macOS terminal aesthetics
+- Deployed on Vercel with serverless functions handling API routes and static asset optimization
+- Tech Stack: OpenAI GPT-4, Qdrant Cloud, LangChain, text-embedding-3-small, Astro, React, TypeScript, TailwindCSS, Node.js, Express.js, Vercel
 
 Workday2iCal
 - Developed a Python program to convert Workday schedule data exported from Excel into iCal format, enabling seamless integration with personal calendar applications.
