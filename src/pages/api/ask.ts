@@ -8,7 +8,10 @@ const masterPrompt = PromptTemplate.fromTemplate(`
 # RESUME ASSISTANT INSTRUCTIONS
 
 ## ROLE
-You are Siddhanth Duggal's resume assistant. You have access to comprehensive information about his background, experience, projects, and skills. Your job is to provide helpful, accurate responses based on the available context.
+You are Siddhanth Duggal's resume assistant. You have access to comprehensive information about his background, experience, projects, and skills. 
+
+## CRITICAL INSTRUCTION: 
+The context below contains ALL the information you need. If someone asks about data-driven systems, machine learning projects, AI work, or technical systems - LOOK FOR and USE any projects involving sentiment analysis, emotion detection, classification, automation, or similar technical work from the context.
 
 ## INTELLIGENT RESPONSE STRATEGY
 
@@ -124,25 +127,37 @@ QUESTION:
 ANSWER:
 `);
 
-// FALLBACK PROMPT for completely ambiguous questions
-const fallbackPrompt = PromptTemplate.fromTemplate(`
-You are Siddhanth Duggal's resume assistant. The user asked a question that doesn't clearly map to specific categories in your knowledge base.
+// CONVERSATIONAL PROMPT for ambiguous/general questions
+const conversationalPrompt = PromptTemplate.fromTemplate(`
+You are Siddhanth Duggal's resume assistant having a natural conversation. The user asked a question that requires conversational understanding rather than direct information lookup.
 
-Based on the available context about Siddhanth, provide a helpful response that:
+## CONVERSATIONAL APPROACH:
+1. **Understand the intent** behind ambiguous questions
+2. **Provide natural, helpful responses** using available context
+3. **Be personable and engaging** while staying professional
+4. **Connect information** from different parts of the context when relevant
 
-1. **Acknowledges their question** and shows you understand what they're asking
-2. **Provides relevant information** from the context that might be helpful
-3. **Suggests specific topics** they could ask about for more detailed information
+## COMMON CONVERSATIONAL PATTERNS:
+- "Tell me about yourself" → Professional summary + key highlights
+- "What do you do?" → Current role, studies, and interests  
+- "What are you good at?" → Skills + achievements
+- "What makes you unique?" → Unique combination of background + achievements
+- "How do you approach problems?" → Problem-solving philosophy + examples
+- "What are you passionate about?" → Interests + how they connect to work
 
-Available topics you can help with:
-- My projects and technical work
-- My work experience and internships  
-- My technical skills and technologies
-- My education and academic background
-- My personal background and interests
-- How to contact me
+## CRITICAL RESPONSE RULES:
+- **ALWAYS examine the ENTIRE context thoroughly** - don't miss relevant information
+- **Use ALL relevant information** from the context that answers the question
+- **Be comprehensive** - if projects exist in context, list them all
+- **Include specific details** - names, technologies, metrics, achievements
+- **First person voice** ("I", "my", "me") as Siddhanth
+- **Natural, conversational tone** while being complete and informative
 
-Use first person ("I", "my", "me") when speaking as Siddhanth. Be conversational and helpful.
+## CONTEXT SEARCH STRATEGY:
+- **Scan the entire context** for any information that could answer the question
+- **Look for related concepts** - "data-driven" relates to ML, AI, analytics, classification, etc.
+- **Don't require exact keyword matches** - understand semantic meaning
+- **Connect information** from different parts of context when relevant
 
 CONTEXT:
 {context}
@@ -152,6 +167,48 @@ QUESTION:
 
 HELPFUL RESPONSE:
 `);
+
+// Function to determine which prompt to use based on question type
+function determinePromptType(question: string): 'structured' | 'conversational' {
+  const q = question.toLowerCase().trim();
+  
+  // Structured/Direct questions - use masterPrompt
+  const structuredPatterns = [
+    /\b(projects?|project|built|developed|created|work on|made)\b/,
+    /\b(experience|experiences|work|worked|job|jobs|internship|internships|career|employment|positions|company|role)\b/,
+    /\b(skills?|technologies?|tech stack|programming|languages?|tools?|technical)\b/,
+    /\b(education|study|degree|university|school|college|academic)\b/,
+    /\b(contact|email|phone|location|reach out|get in touch)\b/,
+    /\b(resume|cv|qualifications?|background)\b/
+  ];
+  
+  // Conversational/Ambiguous questions - use conversationalPrompt
+  const conversationalPatterns = [
+    /\b(tell me about yourself|who are you|what is your name)\b/,
+    /\b(what do you do|what are you doing|current role)\b/,
+    /\b(what are you good at|strengths?|what makes you unique)\b/,
+    /\b(passionate about|interests?|hobbies|enjoy|love|like)\b/,
+    /\b(approach problems?|problem.solving|how do you)\b/,
+    /\b(why should|what makes|describe yourself)\b/,
+    /^(hi|hello|hey|greetings)/,
+    /\b(about|bio|background|personal)\b/
+  ];
+  
+  // Check for conversational patterns first (more specific)
+  const isConversational = conversationalPatterns.some(pattern => pattern.test(q));
+  if (isConversational) {
+    return 'conversational';
+  }
+  
+  // Check for structured patterns
+  const isStructured = structuredPatterns.some(pattern => pattern.test(q));
+  if (isStructured) {
+    return 'structured';
+  }
+  
+  // Default to conversational for ambiguous questions
+  return 'conversational';
+}
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -207,17 +264,20 @@ export const POST: APIRoute = async ({ request }) => {
       temperature: 0.7,
     });
 
+    // Determine which prompt to use based on question analysis
+    const promptType = determinePromptType(question);
+    console.log(`🎯 Using ${promptType} prompt for question: "${question}"`);
+
     let answer;
     
-    // Use fallback prompt for highly ambiguous questions
-    if (isAmbiguous && uniqueResults.length < 3) {
-      // Very ambiguous question with limited context - use fallback
-      const fallbackChain = fallbackPrompt.pipe(llm);
-      answer = await fallbackChain.invoke({ question, context });
+    if (promptType === 'conversational') {
+      // Use conversational prompt for natural, ambiguous questions
+      const conversationalChain = conversationalPrompt.pipe(llm);
+      answer = await conversationalChain.invoke({ question, context });
     } else {
-      // Use main prompt for most questions
-      const chain = masterPrompt.pipe(llm);
-      answer = await chain.invoke({ question, context });
+      // Use structured prompt for direct, specific questions
+      const structuredChain = masterPrompt.pipe(llm);
+      answer = await structuredChain.invoke({ question, context });
     }
 
     return new Response(JSON.stringify({ answer: answer.content }), { status: 200 });
