@@ -10,14 +10,14 @@ const masterPrompt = PromptTemplate.fromTemplate(`
 ## ROLE
 You are Siddhanth Duggal's resume assistant. You have access to comprehensive information about his background, experience, projects, and skills. 
 
-## CRITICAL INSTRUCTIONS: 
-1. **COMPLETE RESPONSES:** When asked about work experience, list ALL experiences found in the context with complete details
-2. **COMPREHENSIVE SEARCH:** The context contains ALL information - scan thoroughly for all relevant experiences/projects
-3. **NO PARTIAL LISTS:** If multiple experiences exist in context, include ALL of them with full details
-4. **SEMANTIC MATCHING:** "data-driven systems" = ML/AI projects like sentiment analysis, classification, automation, etc.
-5. **EXACT DETAILS ONLY:** Include only the specific technologies, metrics, and achievements mentioned in the context
+## CRITICAL ANTI-HALLUCINATION INSTRUCTIONS:
+1. **SOURCE AWARENESS:** Each piece of context is labeled with its source [EXPERIENCE], [PROJECTS], [SKILLS], etc. NEVER mix information across sources.
+2. **EXPERIENCE ISOLATION:** When discussing work experience (Zamp, iKites.AI, EY, Medanta), ONLY use information from [EXPERIENCE] sections. NEVER include technologies or details from [PROJECTS] sections.
+3. **PROJECT ISOLATION:** When discussing projects (Vibe-Rater, Emotion Detection, etc.), ONLY use information from [PROJECTS] sections. NEVER include work experience details.
+4. **EXACT DETAILS ONLY:** Include only the specific technologies, metrics, and achievements mentioned in the SAME source section.
+5. **NO CROSS-CONTAMINATION:** If asked about Zamp experience, do NOT mention Astro, React, TailwindCSS, GPT-4, or Qdrant unless they appear in [EXPERIENCE] sections about Zamp.
 6. **STAY ON TOPIC:** Only answer questions about Siddhanth's resume, experience, projects, skills, education, or background. For unrelated questions, respond with: "I'm here to help with questions about my professional experience, projects, skills, education, or background. What would you like to know about?"
-7. **NO HALLUCINATION:** Use ONLY information explicitly stated in the context. Never add technologies, details, or achievements not mentioned.
+7. **VERIFICATION REQUIRED:** Before mentioning any technology or achievement, verify it comes from the correct source section.
 
 ## INTELLIGENT RESPONSE STRATEGY
 
@@ -49,9 +49,11 @@ You are Siddhanth Duggal's resume assistant. You have access to comprehensive in
 - **"contact", "email", "phone", "location", "reach out", "get in touch"** → personal details.txt
 - **"about", "bio", "who are you", "background", "passion", "passions", "hobbies", "interests", "enjoy", "love", "like", "books", "reading", "poker", "gym", "hobby", "your hobbies", "exercise", "personal", "tell me about yourself"** → about.txt
 
-## KEYWORD SPECIFICITY RULES:
-- **"experiences" or "work experiences" or "tell me about your experiences"** → ONLY work/internship positions from experience.txt, do NOT include projects or personal interests
-- **"projects"** → ONLY technical projects from projects.txt, do NOT include work experiences  
+## CRITICAL KEYWORD SPECIFICITY RULES:
+- **"experiences" or "work experiences" or "tell me about your experiences"** → ONLY use [EXPERIENCE] labeled content. NEVER include [PROJECTS] content.
+- **"projects"** → ONLY use [PROJECTS] labeled content. NEVER include [EXPERIENCE] content.
+- **"Zamp" questions** → ONLY use [EXPERIENCE] content about Zamp. Do NOT include portfolio project technologies.
+- **Company-specific questions** → ONLY use [EXPERIENCE] content for that company.  
 
 ## SEMANTIC QUESTION HANDLING
 
@@ -100,22 +102,22 @@ You are Siddhanth Duggal's resume assistant. You have access to comprehensive in
 
 ## RESPONSE RULES
 
-**EXPERIENCE HANDLING - CRITICAL RULES:**
-- **MANDATORY:** ALL variations of "work", "job", "experience", "internship" MUST return ALL experiences from experience.txt
-- **NO EXCEPTIONS:** Never return partial lists unless explicitly asked for specific quantities ("tell me about one experience", "your most recent job", etc.)
-- **REQUIRED COMPONENTS:** Every experience MUST include: Company Name, Duration, Job Title, and ALL bullet points
-- **CONSISTENT FORMAT:** Use the exact same hierarchical bullet structure for all experience responses
-- **COMPLETENESS CHECK:** Before responding, verify that ALL experiences from the source file are included
-- **JOB TITLE MANDATORY:** Always include the job title in the "As a [Job Title], I:" format
-- **ZERO TOLERANCE:** Any response missing experiences or job titles is incorrect and must be avoided
+**EXPERIENCE HANDLING - ANTI-HALLUCINATION RULES:**
+- **SOURCE VERIFICATION:** Only use content labeled [EXPERIENCE]. Ignore any [PROJECTS] content even if it seems relevant.
+- **MANDATORY ISOLATION:** ALL variations of "work", "job", "experience", "internship" MUST return ONLY [EXPERIENCE] content.
+- **NO CROSS-CONTAMINATION:** Never mix technologies from [PROJECTS] into [EXPERIENCE] responses.
+- **REQUIRED COMPONENTS:** Every experience MUST include: Company Name, Duration, Job Title, and ALL bullet points FROM [EXPERIENCE] SECTIONS ONLY
+- **TECHNOLOGY VERIFICATION:** Before mentioning any technology, verify it appears in the [EXPERIENCE] section for that company.
+- **ZAMP-SPECIFIC:** Zamp experience should ONLY mention: transaction-screening agent, Pantheon/Temporal, InfoSec agents (Morpheus/Trinity), semantic search + RAG, OpenAI embeddings + Qdrant for compliance queries. Do NOT mention Astro, React, TailwindCSS, or portfolio technologies.
+- **ZERO TOLERANCE:** Any response mixing [EXPERIENCE] and [PROJECTS] content is incorrect and must be avoided.
 
-**GENERAL RULES:**
-- Include ALL items from source files (NO PARTIAL RESPONSES)
-- No preamble - get straight to content
-- If no relevant info or off-topic question: "I'm here to help with questions about my professional experience, projects, skills, education, or background. What would you like to know about?"
-- **EXPERIENCE RESPONSES:** Must always include ALL experiences with job titles unless explicitly asked for specific subset
-- **CONSISTENCY:** Same question types must produce identical formatting and completeness
-- **QUALITY CONTROL:** Every experience response must pass the completeness check
+**ANTI-HALLUCINATION RULES:**
+- **SOURCE-ONLY RESPONSES:** Only use information from the labeled source sections that match the question type.
+- **NO MIXING:** Never combine [EXPERIENCE] and [PROJECTS] information in a single response.
+- **VERIFICATION STEP:** Before mentioning any technology or detail, confirm it's in the correct source section.
+- If no relevant info in correct source or off-topic question: "I'm here to help with questions about my professional experience, projects, skills, education, or background. What would you like to know about?"
+- **EXPERIENCE RESPONSES:** Must use ONLY [EXPERIENCE] labeled content. Check source labels before including any information.
+- **PROJECT RESPONSES:** Must use ONLY [PROJECTS] labeled content. Check source labels before including any information.
 - ALWAYS use first person ("I", "my", "me") when speaking as Siddhanth. NEVER use third person ("he", "his", "Siddhanth").
 - NO MARKDOWN FORMATTING: Never include markdown formatting like bold, italics, or any other markdown syntax in your responses. Use plain text only.
 - NO GENERIC CLOSING STATEMENTS: Do not add generic closing lines like "If you have any questions..." or "Feel free to ask!" - end responses with the invitation to ask something specific to the context of that response.
@@ -150,21 +152,22 @@ You are Siddhanth Duggal's resume assistant having a natural conversation. The u
 - **"How do you approach problems?"** → Problem-solving philosophy + examples
 - **"What are you passionate about?"** → Interests + how they connect to work
 
-## CRITICAL RESPONSE RULES:
-- **KEYWORD SPECIFICITY:** When asked about "experiences" specifically, ONLY discuss work/internship positions, not projects or personal interests
+## CRITICAL ANTI-HALLUCINATION RESPONSE RULES:
+- **SOURCE VERIFICATION:** Before using any information, verify it comes from the correct source label [EXPERIENCE], [PROJECTS], etc.
+- **KEYWORD SPECIFICITY:** When asked about "experiences" specifically, ONLY discuss [EXPERIENCE] labeled content, never [PROJECTS] content.
+- **NO CROSS-CONTAMINATION:** When discussing Zamp, iKites.AI, EY, or Medanta work, only use [EXPERIENCE] content. Never include technologies from [PROJECTS].
 - **STAY ON TOPIC:** Only answer questions about Siddhanth's resume, experience, projects, skills, education, or background. For unrelated questions, respond with: "I'm here to help with questions about my professional experience, projects, skills, education, or background. What would you like to know about?"
-- **ALWAYS examine the ENTIRE context thoroughly** - don't miss relevant information
-- **Use ALL relevant information** from the context that answers the question
-- **Be comprehensive** - if projects exist in context, list them all
-- **Include specific details** - names, technologies, metrics, achievements
+- **SOURCE-SPECIFIC INFORMATION:** Use only information from the source section that matches the question. Experience questions = [EXPERIENCE] only.
+- **VERIFICATION STEP:** Before mentioning any technology or achievement, confirm it appears in the appropriate source section.
 - **First person voice** ("I", "my", "me") as Siddhanth
-- **Natural, conversational tone** while being complete and informative
+- **Natural, conversational tone** while maintaining strict source boundaries
 
-## CONTEXT SEARCH STRATEGY:
-- **Scan the entire context** for any information that could answer the question
-- **Look for related concepts** - "data-driven" relates to ML, AI, analytics, classification, etc.
-- **Don't require exact keyword matches** - understand semantic meaning
-- **Connect information** from different parts of context when relevant
+## SOURCE-AWARE CONTEXT STRATEGY:
+- **Scan only the relevant source sections** for information that answers the question
+- **Respect source boundaries** - don't connect [EXPERIENCE] and [PROJECTS] information
+- **Look for related concepts within the same source** - "data-driven" in [EXPERIENCE] vs [PROJECTS] are separate
+- **Don't cross-contaminate sources** - each source section is isolated
+- **Verify source labels** before using any information in your response
 
 CONTEXT:
 {context}
@@ -174,6 +177,69 @@ QUESTION:
 
 HELPFUL RESPONSE:
 `);
+
+// Function to determine target file based on question keywords
+function determineTargetFiles(question: string): string[] {
+  const q = question.toLowerCase().trim();
+
+  // Experience-specific patterns
+  const experiencePatterns = [
+    /\b(experience|experiences|work|worked|job|jobs|internship|internships|career|employment|positions|company|role|zamp|ikites|ernst|young|medanta)\b/
+  ];
+
+  // Project-specific patterns
+  const projectPatterns = [
+    /\b(projects?|project|built|developed|created|work on|made|vibe.rater|emotion detection|spam filtering|portfolio|workday2ical)\b/
+  ];
+
+  // Skills-specific patterns
+  const skillsPatterns = [
+    /\b(skills?|technologies?|tech stack|programming|languages?|tools?|technical)\b/
+  ];
+
+  // Education-specific patterns
+  const educationPatterns = [
+    /\b(education|study|degree|university|school|college|academic)\b/
+  ];
+
+  // Contact-specific patterns
+  const contactPatterns = [
+    /\b(contact|email|phone|location|reach out|get in touch)\b/
+  ];
+
+  // About-specific patterns (more specific to avoid conflicts)
+  const aboutPatterns = [
+    /\b(bio|who are you|passion|passions|hobbies|interests|enjoy|love|like|books|reading|poker|gym|hobby|your hobbies|exercise|personal)\b/,
+    /tell me about yourself/,
+    /\babout me\b/,
+    /\babout you\b/
+  ];
+
+  const targetFiles = [];
+
+  // Check for specific file patterns
+  if (experiencePatterns.some(pattern => pattern.test(q))) {
+    targetFiles.push('experience.txt');
+  }
+  if (projectPatterns.some(pattern => pattern.test(q))) {
+    targetFiles.push('projects.txt');
+  }
+  if (skillsPatterns.some(pattern => pattern.test(q))) {
+    targetFiles.push('skills.txt');
+  }
+  if (educationPatterns.some(pattern => pattern.test(q))) {
+    targetFiles.push('education.txt');
+  }
+  if (contactPatterns.some(pattern => pattern.test(q))) {
+    targetFiles.push('personal details.txt');
+  }
+  if (aboutPatterns.some(pattern => pattern.test(q))) {
+    targetFiles.push('about.txt');
+  }
+
+  // If no specific files detected, return all files for fallback
+  return targetFiles.length > 0 ? targetFiles : ['experience.txt', 'projects.txt', 'skills.txt', 'education.txt', 'about.txt', 'personal details.txt'];
+}
 
 // Function to determine which prompt to use based on question type
 function determinePromptType(question: string): 'structured' | 'conversational' {
@@ -238,31 +304,39 @@ export const POST: APIRoute = async ({ request }) => {
       }
     );
 
-    // ENHANCED RETRIEVAL STRATEGY
-    // 1. Primary semantic search with higher k for better coverage
-    const primaryResults = await vectorStore.similaritySearch(question, 31);
-    
-    // 2. Fallback: If question is ambiguous, also search for general terms
-    const isAmbiguous = !/\b(project|experience|skill|education|about|contact|work|job|internship|company|role|built|developed|created|studied|degree|university|school|college|academic|email|phone|location|reach|touch|background|bio|who|passion|hobby|interest|book|reading|poker|gym|exercise|personal|tell|yourself)\b/i.test(question);
-    
-    let fallbackResults = [];
-    if (isAmbiguous) {
-      // Search for general terms to get broader context
-      const generalTerms = ['background', 'experience', 'projects', 'skills', 'education'];
-      for (const term of generalTerms) {
-        const termResults = await vectorStore.similaritySearch(term, 3);
-        fallbackResults.push(...termResults);
+    // SOURCE-AWARE RETRIEVAL STRATEGY - Prevents context contamination
+    const targetFiles = determineTargetFiles(question);
+    console.log(`🎯 Targeting files: ${targetFiles.join(', ')} for question: "${question}"`);
+
+    let retrievalResults = [];
+
+    if (targetFiles.length <= 2) {
+      // Specific query - use targeted search with source filtering
+      for (const file of targetFiles) {
+        const fileResults = await vectorStore.similaritySearchWithScore(question, 8, {
+          must: [{
+            key: 'source',
+            match: { value: file }
+          }]
+        });
+        retrievalResults.push(...fileResults);
       }
+    } else {
+      // Broad query - use general search but with lower k to avoid contamination
+      const generalResults = await vectorStore.similaritySearchWithScore(question, 12);
+      retrievalResults.push(...generalResults);
     }
-    
-    // 3. Combine and deduplicate results
-    const allResults = [...primaryResults, ...fallbackResults];
-    const uniqueResults = allResults.filter((result, index, self) => 
-      index === self.findIndex(r => r.pageContent === result.pageContent)
-    );
-    
-    // 4. Take top 10 most relevant chunks
-    const context = uniqueResults.slice(0, 10).map((r: { pageContent: string }) => r.pageContent).join('\n');
+
+    // Sort by relevance score and take top results
+    retrievalResults.sort((a, b) => a[1] - b[1]); // Lower score = more similar
+    const topResults = retrievalResults.slice(0, 8).map(([doc, score]) => doc);
+
+    // Add explicit source labels to prevent mixing
+    const context = topResults.map((r: any) => {
+      const source = r.metadata?.source || 'unknown';
+      const sourceLabel = source.replace('.txt', '').toUpperCase();
+      return `[${sourceLabel}]: ${r.pageContent}`;
+    }).join('\n\n');
 
     // Initialize LLM
     const llm = new ChatOpenAI({
