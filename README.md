@@ -53,13 +53,19 @@ The AI agent dynamically decides whether to fetch from the knowledge base, use G
    - The `/api/ask` route (Astro API endpoint) handles RAG logic, using Qdrant for retrieval and OpenAI for LLM synthesis.
    - No separate Express server is needed; the backend is fully serverless and Vercel-compatible.
 
-5. **Terminal UI Integration**  
-   - AI responses are piped into a macOS-styled terminal UI built with React, maintaining the illusion of a native system interface.
+### **Contact**
+- **Email**: sidkduggal@gmail.com
+- **LinkedIn**: [linkedin.com/in/siddhanth-duggal](https://linkedin.com/in/siddhanth-duggal)
+- **GitHub**: [github.com/skduggal](https://github.com/skduggal)
 
 ---
 
-### About Me
+## 📄 License
 
-I'm **Siddhanth Duggal**, a BSc student in Statistics & Biochemistry at UBC with a focus on applied AI and quant finance. This portfolio demonstrates my ability to design **end-to-end AI systems**, from vector databases to UI integration, while keeping a focus on user-centric design.
+I'm **Siddhanth Duggal**, a BSc student in Statistics & Biochemistry at UBC with a focus on applied 
+AI and quant finance. This portfolio demonstrates my ability to design **end-to-end AI systems**, 
+from vector databases to UI integration, while keeping a focus on user-centric design.
 
-> *"If ChatGPT and macOS had a baby, it would be this portfolio."*
+This project is open source and available under the [MIT License](LICENSE).
+
+---
